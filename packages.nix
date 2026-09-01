@@ -51,6 +51,29 @@
     }
   ];
 
+  # A top-level navigation to any page gets the shell, which frames the
+  # original URL via SSI `request_uri` (never rewritten by nginx). The frame's
+  # own request carries Sec-Fetch-Dest: iframe and falls through to the page.
+  # Zola pages end in "/", so assets and streams are untouched. Clients without
+  # Sec-Fetch-Dest (curl, crawlers, old Safari) get the bare page.
+  nginxHttpConfig = ''
+    map "$http_sec_fetch_dest$uri" $shell_page {
+      ~^document.*/$  /listen/index.html;
+      default         /__none;
+    }
+
+    # 1 vCPU, icecast <clients>100</clients>: without these one client holding
+    # a few hundred /stream.* connections takes the station down.
+    limit_conn_zone $binary_remote_addr zone=stream:1m;
+    limit_req_zone  $binary_remote_addr zone=pages:1m rate=10r/s;
+    limit_conn_status 429;
+    limit_req_status  429;
+  '';
+
+  # A shell load is ~10 requests at once (page, css, fonts, two frames, their
+  # fragments), then a fragment every 10s per listener.
+  pageLimit = "limit_req zone=pages burst=40 nodelay;";
+
   # `stateDir` is where liquidsoap writes (absolute in prod, relative in dev).
   # `extraHeaders` is repeated in every location that adds its own header:
   # nginx `add_header` in a location discards the inherited set.
@@ -59,16 +82,14 @@
     extraHeaders ? "",
   }:
     {
-      "= /".extraConfig = ''
-        if ($http_sec_fetch_dest = iframe) { rewrite ^ /index.html last; }
-        rewrite ^ /listen/index.html last;
-      '';
-
       "/".extraConfig = ''
-        try_files $uri $uri/ =404;
+        ${pageLimit}
+        try_files $shell_page $uri $uri/ =404;
       '';
 
       "~ ^/stream\\.(mp3|opus)$".extraConfig = ''
+        # Two mounts plus a reconnect in flight per household.
+        limit_conn stream 6;
         proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_buffering off;
@@ -91,6 +112,7 @@
     // lib.listToAttrs (map (f:
       lib.nameValuePair "= /${f.name}" {
         extraConfig = ''
+          ${pageLimit}
           alias ${stateDir}/${f.file};
           default_type ${f.type};
           add_header Cache-Control "no-store, no-cache, must-revalidate";
@@ -125,6 +147,7 @@
         access_log radio/state/logs/nginx_access.log;
         client_body_temp_path radio/state/nginx_client_body;
         proxy_temp_path radio/state/nginx_proxy;
+        ${nginxHttpConfig}
 
         server {
           listen 8099;
@@ -136,7 +159,7 @@
       }
     '';
 in {
-  inherit nginxLocations;
+  inherit nginxLocations nginxHttpConfig;
 
   site = pkgs.runCommand "hisilome-site" {} ''
     cp -r ${src} s
