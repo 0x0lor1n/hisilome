@@ -82,6 +82,17 @@
     };
 
     listenerCount = cell.packages.listener-count;
+
+    # Repeated in every location that adds its own header: nginx `add_header`
+    # in a location discards the server-level set. 'unsafe-inline' on style-src
+    # only: liquidsoap's fragments and the tag cloud use style attributes.
+    securityHeaders = ''
+      add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
+      add_header Content-Security-Policy "default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'" always;
+      add_header X-Content-Type-Options nosniff always;
+      add_header Referrer-Policy strict-origin-when-cross-origin always;
+      add_header Alt-Svc 'h3=":443"; ma=86400' always;
+    '';
   in {
     options.services.hisilome = {
       enable = mkEnableOption "the Hísilómë site and radio station";
@@ -368,6 +379,8 @@
         virtualHosts.${cfg.domain} = {
           enableACME = cfg.enableACME;
           forceSSL = cfg.enableACME;
+          quic = cfg.enableACME;
+          http3 = cfg.enableACME;
           root = "${cfg.site}";
 
           # ssi on is REQUIRED: static/live.html:129 and static/schedule.html:16
@@ -375,6 +388,7 @@
           # render with a silent empty hole and still return 200.
           extraConfig = ''
             ssi on;
+            ${securityHeaders}
           '';
 
           locations =
@@ -392,8 +406,8 @@
               '';
 
               # radio/nginx.conf:52-72, header-for-header.
-              "= /stream.mp3".extraConfig = ''
-                proxy_pass http://127.0.0.1:8000/stream.mp3;
+              "~ ^/stream\\.(mp3|opus)$".extraConfig = ''
+                proxy_pass http://127.0.0.1:8000;
                 proxy_http_version 1.1;
                 proxy_buffering off;
                 proxy_request_buffering off;
@@ -423,6 +437,7 @@
                       alias ${radioState}/${f.file};
                       default_type ${f.type};
                       add_header Cache-Control "no-store, no-cache, must-revalidate";
+                      ${securityHeaders}
                       ssi off;
                     '';
                   }
