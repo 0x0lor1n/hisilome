@@ -17,7 +17,7 @@
     filter = path: type: let
       rel = lib.removePrefix (toString ./. + "/") (toString path);
     in
-      !(lib.hasPrefix "music" rel || lib.hasPrefix "radio/state" rel);
+      !(lib.hasPrefix "music" rel || lib.hasPrefix "radio/state" rel || lib.hasPrefix "diagrams/out" rel);
   };
 
   mkScript = name: runtimeInputs:
@@ -25,6 +25,41 @@
       inherit name runtimeInputs;
       text = builtins.readFile "${src}/bin/${name}.sh";
     };
+
+  # d2 takes .ttf only; the page ships Iosevka as woff2 subsets. Decompress
+  # those rather than pulling iosevka-bin (a .ttc, which d2 also refuses), so
+  # the diagrams use the exact glyph set the prose does.
+  d2-fonts =
+    pkgs.runCommand "hisilome-d2-fonts" {
+      nativeBuildInputs = [(pkgs.python3.withPackages (p: [p.fonttools p.brotli]))];
+    } ''
+      mkdir -p $out
+      for w in regular bold; do
+        fonttools ttLib.woff2 decompress ${src}/static/fonts/iosevka-$w.woff2 -o $out/$w.ttf
+      done
+    '';
+
+  # d2 -> static/ before zola build; zola copies static/ into the output root.
+  # --scale 1 writes width/height on the <svg>, so the browser draws diagrams at
+  # native size instead of stretching a 360px chain to the column width.
+  # classes.d2 is import-only, so compile the numbered diagrams only. One
+  # definition for the derivation and the dev loop so the two cannot drift.
+  # No italic subset is shipped, so italic falls back to regular.
+  build-site = pkgs.writeShellApplication {
+    name = "build-site";
+    runtimeInputs = [pkgs.d2 pkgs.zola pkgs.coreutils];
+    text = ''
+      export D2_FONT_REGULAR=${d2-fonts}/regular.ttf
+      export D2_FONT_ITALIC=${d2-fonts}/regular.ttf
+      export D2_FONT_BOLD=${d2-fonts}/bold.ttf
+      export D2_FONT_SEMIBOLD=${d2-fonts}/bold.ttf
+      mkdir -p static/diagrams
+      for f in diagrams/[0-9]*.d2; do
+        d2 --theme 200 --pad 20 --scale 1 "$f" "static/diagrams/$(basename "$f" .d2).svg"
+      done
+      zola build "$@"
+    '';
+  };
 
   # Fragments liquidsoap writes into radio/state, served outside the site root
   # so `zola build` cannot delete them.
@@ -159,14 +194,34 @@
       }
     '';
 in {
-  inherit nginxLocations nginxHttpConfig;
+  inherit nginxLocations nginxHttpConfig build-site;
 
   site = pkgs.runCommand "hisilome-site" {} ''
+    set -e
     cp -r ${src} s
     chmod -R u+w s
     cd s
-    ${pkgs.zola}/bin/zola build --output-dir $out
+    export HOME=$TMPDIR
+    ${build-site}/bin/build-site --output-dir $out
   '';
+
+  # Preview through the same nginx config as prod (SSI, fragments, headers).
+  # `zola serve` does none of that: the SSI comments leak into the page as text.
+  dev-site = pkgs.writeShellApplication {
+    name = "dev-site";
+    runtimeInputs = [build-site cell.packages.dev-nginx pkgs.watchexec pkgs.coreutils];
+    text = ''
+      build-site
+      dev-nginx &
+      trap 'kill $!' EXIT
+      echo "site: http://localhost:8099 (stream/console 502 unless the station is up)"
+      exec watchexec \
+        --watch content --watch templates --watch static --watch diagrams --watch config.toml \
+        --ignore 'static/diagrams/**' \
+        --debounce 300ms --on-busy-update=queue \
+        -- build-site
+    '';
+  };
 
   dev-nginx = pkgs.writeShellApplication {
     name = "dev-nginx";
