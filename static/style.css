@@ -50,6 +50,7 @@
   --bg-dim: var(--sumi-ink-0);
   --fg: var(--old-white);
   --muted: var(--fuji-gray);
+  --meta: #9c9b93;             /* fuji-gray lightened: 5.86:1 on --bg; informational text, not decor */
   /* the shell's retro loader; lit by /status.html when the station is down */
   --ld-loader:
     /* the lit run: 5 segments, crawling left to right */
@@ -84,6 +85,17 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Keyboard focus is visible everywhere; mouse focus draws nothing. Elements
+   with their own :focus-visible rule (.prompt, .console-audio) add to this. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 body {
@@ -158,18 +170,18 @@ a:hover {
 }
 
 .cmd {
-  color: var(--muted);
+  color: var(--meta);
+}
+
+.topbar nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .topbar nav a {
   color: var(--link);
-  /* :last-child below, or the trailing gap pushes the cursor off the command */
-  margin-right: 0.5rem;
   text-decoration: underline;
-}
-
-.topbar nav a:last-child {
-  margin-right: 0;
 }
 
 .topbar nav a:hover {
@@ -322,7 +334,7 @@ main > h2:first-child {
   display: flex;
   flex-wrap: wrap;
   gap: 1.1rem;
-  color: var(--muted);
+  color: var(--meta);
   font-size: 0.85rem;
   margin-bottom: 0.4rem;
 }
@@ -345,7 +357,7 @@ main > h2:first-child {
 }
 
 .meta a {
-  color: var(--muted);
+  color: var(--meta);
   text-decoration: underline;
 }
 
@@ -356,7 +368,7 @@ main > h2:first-child {
 /* Inside the shell the address bar always shows "/"; this is the copyable URL.
    One click selects it whole. */
 .permalink {
-  color: var(--muted);
+  color: var(--meta);
   font-size: 0.85rem;
   margin-bottom: 1.2rem;
 }
@@ -368,7 +380,7 @@ main > h2:first-child {
 }
 
 .permalink a {
-  color: var(--muted);
+  color: var(--meta);
   text-decoration: none;
 }
 
@@ -384,7 +396,7 @@ main > h2:first-child {
 }
 
 .summary {
-  color: var(--carp-yellow);
+  color: var(--fg);
 }
 
 p {
@@ -458,7 +470,7 @@ main img {
 }
 
 del {
-  color: var(--muted);
+  color: var(--meta);
 }
 
 .footnotes {
@@ -466,7 +478,7 @@ del {
   padding-top: 1rem;
   border-top: 1px solid var(--border);
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--meta);
 }
 
 .footnotes hr {
@@ -516,7 +528,7 @@ pre code[data-lang]::after {
 pre code[data-lang]::before {
   content: attr(data-lang);
   left: 0;
-  color: var(--muted);
+  color: var(--meta);
   border-right: 1px solid var(--border);
   border-radius: 0 0 3px 0;
 }
@@ -561,7 +573,7 @@ main li > strong:first-child {
   display: inline-flex;
   align-items: center;
   gap: 0.15rem;
-  color: var(--muted);
+  color: var(--meta);
 }
 
 .cursor {
@@ -619,7 +631,7 @@ main li > strong:first-child {
 }
 
 footer {
-  color: var(--muted);
+  color: var(--meta);
   font-size: 0.85rem;
 }
 
@@ -855,7 +867,7 @@ body.framed {
   padding: 0.4rem 1rem 0.6rem;
   border-top: 1px solid rgba(149, 127, 184, 0.18);
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--meta);
   text-align: center;
 }
 
@@ -897,7 +909,7 @@ body.framed {
 .sc-toggle > summary {
   display: inline;
   cursor: pointer;
-  color: var(--muted);
+  color: var(--meta);
   list-style: none;
   white-space: nowrap;
 }
@@ -999,7 +1011,7 @@ body.framed {
   margin: 0;
   padding: 0.5rem 1rem;
   background: transparent;
-  color: var(--muted);
+  color: var(--meta);
   font-size: 0.78rem;
 }
 
@@ -1023,7 +1035,7 @@ body.framed {
 
 .sc-w {
   flex: 0 0 auto;
-  color: var(--muted);
+  color: var(--meta);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1035,124 +1047,6 @@ body.framed {
    of the album shoving the time column off a narrow row. */
 .sc-a { color: var(--muted); }
 .sc-now .sc-a { color: var(--carp-yellow); font-weight: 400; opacity: 0.72; }
-
-/* inside live.html */
-
-.rc-body {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  overflow: hidden;
-  text-align: center;
-}
-
-.rc-title {
-  margin: 0;
-  color: var(--carp-yellow);
-  font-size: 1rem;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.rc-sub {
-  margin: 0.1rem 0 0;
-  color: var(--link);
-  font-size: 0.75rem;
-}
-
-/* darkest ink: sumiInk5 let the unfilled half out-glow the yellow fill */
-.rc-bar {
-  margin: 0.5rem 0 0.25rem;
-  /* 6px, not 10: at 10 the fill was the largest warm block on screen and
-     out-shouted the post title. It is a status readout, not a heading. */
-  height: 6px;
-  background: var(--sumi-ink-0);
-  border: 1px solid rgba(149, 127, 184, 0.45);
-  overflow: hidden;
-}
-
-/* A negative animation-delay starts it partway through, so the bar renders
-   already-advanced. --dur/--elapsed come from liquidsoap's style attribute. */
-.rc-fill {
-  display: block;
-  height: 100%;
-  width: 0;
-  background-color: var(--carp-yellow);
-  /* thinner bar, quieter fill: the rc-heat warning still reads through it */
-  opacity: 0.8;
-  /* Beam head, so the bar reads as painted rather than grown. Static gradient
-     on an already-moving element; fixed px so it does not stretch. */
-  background-image: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0) calc(100% - 18px),
-    rgba(255, 255, 255, 0.38) 100%
-  );
-  /* width and colour on the same clock: same duration, same negative delay */
-  animation:
-    rc-fill var(--dur, 0s) linear var(--elapsed, 0s) forwards,
-    rc-heat var(--dur, 0s) linear var(--elapsed, 0s) forwards;
-}
-
-/* Information, not decoration: a warm bar means the next entry is about to
-   become "now". Sakura appears nowhere else, so the signal stays unambiguous. */
-@keyframes rc-heat {
-  0%,
-  88% {
-    background-color: var(--carp-yellow);
-  }
-  100% {
-    background-color: var(--sakura-pink);
-  }
-}
-
-@keyframes rc-fill {
-  from { width: 0; }
-  to   { width: 100%; }
-}
-
-/* Pause, not disable: a paused animation still renders at its negative-delay
-   offset, so the bar shows the true position. animation:none leaves it empty. */
-@media (prefers-reduced-motion: reduce) {
-  .rc-fill { animation-play-state: paused; }
-}
-
-.rc-clock {
-  margin: 0;
-  color: var(--boat-yellow);
-  font-size: 0.75rem;
-}
-
-/* Text clears the floating player; the bar does not, so it still spans the
-   console. Symmetric so the title stays centred. */
-.rc-title,
-.rc-sub,
-.rc-clock {
-  padding: 0 180px;
-}
-
-@media (max-width: 640px) {
-  .rc-title,
-  .rc-sub,
-  .rc-clock {
-    padding: 0;
-  }
-}
-
-/* animated integer counters: a per-second clock with no document reload */
-@property --m { syntax: "<integer>"; initial-value: 0; inherits: false; }
-@property --s { syntax: "<integer>"; initial-value: 0; inherits: false; }
-.rc-m { counter-reset: m var(--m); }
-.rc-m::after { content: counter(m); }
-.rc-m.rc-static::after { content: none; }
-.rc-s { counter-reset: s var(--s); }
-.rc-s::after { content: counter(s, decimal-leading-zero); }
-@keyframes rc-min { from { --m: 0; } to { --m: var(--tm); } }
-@keyframes rc-sec { from { --s: 0; } to { --s: 60; } }
-@media (prefers-reduced-motion: reduce) {
-  .rc-m, .rc-s { animation-play-state: paused; }
-}
 
 @media (max-width: 640px) {
   /* Compact console: the 180px title padding is gone, so the absolute player
@@ -1255,7 +1149,7 @@ figure.pair img {
 }
 figure.pair figcaption {
   flex-basis: 100%;
-  color: var(--muted);
+  color: var(--meta);
   font-size: 0.85rem;
   margin-top: 0.25rem;
 }
@@ -1462,7 +1356,7 @@ body.framed::before {
   font-size: 0.6em;
   vertical-align: super;
   margin-left: 0.15em;
-  color: var(--muted);
+  color: var(--meta);
   text-shadow: none;
 }
 
