@@ -1,0 +1,21 @@
+{#- Two-voice dialogue. Body is plain text: one reply per paragraph, each
+    starting with the speaker name and a period ("KRITON. ..." / "0x0lor1n. ...").
+    Wrapped lines inside a paragraph are joined. Each speaker gets a colour and
+    a 48x48 pixel avatar from static/img/ (source: scripts/sprites.py); a line
+    that starts with neither name is rendered as a stage direction without an
+    avatar. No JS. -#}
+<div class="dialogue">
+{%- for para in body | trim | split(pat="\n\n") %}
+{%- set line = para | trim | replace(from="\n", to=" ") %}
+{%- if line is starting_with("KRITON.") %}
+{%- set who = "k" %}{%- set name = "KRITON." %}{%- set icon = "kriton" %}
+{%- set text = line | trim_start_matches(pat="KRITON.") | trim %}
+{%- elif line is starting_with("0x0lor1n.") %}
+{%- set who = "o" %}{%- set name = "0x0lor1n." %}{%- set icon = "olorin" %}
+{%- set text = line | trim_start_matches(pat="0x0lor1n.") | trim %}
+{%- else %}
+{%- set who = "x" %}{%- set name = "" %}{%- set icon = "" %}{%- set text = line %}
+{%- endif %}
+<p class="{{ who }}">{%- if icon %}<img src="/img/{{ icon }}.png" width="48" height="48" alt="" loading="lazy">{% endif %}<span><b>{{ name }}</b> {{ text | markdown(inline=true) | safe }}</span></p>
+{%- endfor %}
+</div>

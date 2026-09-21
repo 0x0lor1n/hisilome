@@ -444,6 +444,70 @@ blockquote {
   margin-bottom: 1rem;
 }
 
+/* Two-voice dialogue (shortcodes/dialogue.html). One rule down the left of
+   the whole block, every reply is a <p> with a speaker class that owns a
+   colour and a 48x48 pixel avatar (static/img/{kriton,olorin}.png, drawn by
+   scripts/sprites.py). Avatars sit inside the column between the rule and
+   the text, reply text is vertically centred on the avatar; they scale
+   only by whole factors so the pixels stay crisp. Both
+   voices are left-aligned - this is a Platonic dialogue, not a chat. */
+.dialogue {
+  --avatar: 48px;
+  margin-bottom: 1rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--sumi-ink-5);
+}
+
+.dialogue p {
+  --who: var(--boat-yellow);
+  display: grid;
+  grid-template-columns: var(--avatar) 1fr;
+  column-gap: 0.6rem;
+  align-items: center;
+  min-height: var(--avatar);
+  margin: 0 0 0.35rem;
+  line-height: 1.45;
+  color: var(--who);
+}
+
+.dialogue p:last-child {
+  margin-bottom: 0;
+}
+
+.dialogue p b {
+  font-weight: 700;
+  margin-right: 0.25em;
+}
+
+.dialogue p img {
+  display: block;
+  width: var(--avatar);
+  height: var(--avatar);
+  margin: 0; /* main img adds margin-bottom, which pushes the row centre down */
+  border-radius: 0;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.dialogue p.x {
+  grid-template-columns: 1fr;
+}
+
+.dialogue .k {
+  --who: var(--crystal-blue);
+}
+
+.dialogue .o {
+  --who: var(--spring-green);
+}
+
+@media (max-width: 640px) {
+  /* Narrow screens: keep 1x, nothing changes but the gap. */
+  .dialogue p {
+    column-gap: 0.5rem;
+  }
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
