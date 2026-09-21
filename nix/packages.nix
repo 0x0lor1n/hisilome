@@ -1,21 +1,19 @@
 # The rendered site, the station scripts, and the nginx location set shared by
 # the NixOS module and the dev stack so the two cannot drift.
-{
-  inputs,
-  cell,
-  ...
-}: let
-  pkgs = inputs.pkgs;
+#
+# Called with the consumer's nixpkgs (`import ./nix/packages.nix pkgs`): the
+# NixOS module passes the host's, flake.nix passes its own pinned one.
+pkgs: let
   lib = pkgs.lib;
 
   # music/ (1.1 GB, gitignored) and radio/state/ (rewritten every second by a
   # running station) would otherwise churn the site derivation -- and through
   # it the host toplevel -- on every edit.
   src = builtins.path {
-    path = ./.;
+    path = ../.;
     name = "hisilome-src";
     filter = path: type: let
-      rel = lib.removePrefix (toString ./. + "/") (toString path);
+      rel = lib.removePrefix (toString ../. + "/") (toString path);
     in
       !(lib.hasPrefix "music" rel || lib.hasPrefix "radio/state" rel || lib.hasPrefix "diagrams/out" rel);
   };
@@ -246,7 +244,7 @@
     fragments);
 
   # Dev nginx: the same locations in a standalone config. Relative paths
-  # resolve against `-p $PWD` (cells/hisilome).
+  # resolve against `-p $PWD` (the repo root).
   devNginxConf = let
     locs = nginxLocations {stateDir = "radio/state";};
     render = lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: ''
@@ -282,8 +280,19 @@
         }
       }
     '';
+
+  dev-nginx = pkgs.writeShellApplication {
+    name = "dev-nginx";
+    runtimeInputs = [pkgs.nginx pkgs.coreutils];
+    text = ''
+      mkdir -p radio/state/logs
+      exec nginx -c ${devNginxConf} -p "$PWD" "$@"
+    '';
+  };
 in {
-  inherit nginxLocations nginxHttpConfig build-site;
+  # The three non-derivations are for the NixOS module (nginx.nix) and the dev
+  # stack; flake.nix filters them out of `packages`.
+  inherit nginxLocations nginxHttpConfig devNginxConf build-site dev-nginx;
 
   # Marks the station offline (see `fragments`). Run from the unit's
   # ExecStopPost, or by hand in dev. `station-online` clears it.
@@ -315,7 +324,7 @@ in {
   # `zola serve` does none of that: the SSI comments leak into the page as text.
   dev-site = pkgs.writeShellApplication {
     name = "dev-site";
-    runtimeInputs = [build-site cell.packages.dev-nginx pkgs.watchexec pkgs.coreutils];
+    runtimeInputs = [build-site dev-nginx pkgs.watchexec pkgs.coreutils];
     text = ''
       build-site
       dev-nginx &
@@ -326,15 +335,6 @@ in {
         --ignore 'content/**/*.svg' \
         --debounce 300ms --on-busy-update=queue \
         -- build-site
-    '';
-  };
-
-  dev-nginx = pkgs.writeShellApplication {
-    name = "dev-nginx";
-    runtimeInputs = [pkgs.nginx pkgs.coreutils];
-    text = ''
-      mkdir -p radio/state/logs
-      exec nginx -c ${devNginxConf} -p "$PWD" "$@"
     '';
   };
 

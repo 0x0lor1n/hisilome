@@ -1,12 +1,11 @@
 {
-  inputs,
-  cell,
-}: {
   config,
   lib,
+  pkgs,
   ...
 }: let
   cfg = config.services.hisilome;
+  hisilome = import ../packages.nix pkgs;
   radioState = "${cfg.stateDir}/radio/state";
 
   # 'unsafe-inline' on style-src only: liquidsoap's fragments and the tag cloud
@@ -32,7 +31,7 @@ in {
       recommendedGzipSettings = true;
       recommendedOptimisation = true;
 
-      appendHttpConfig = cell.packages.nginxHttpConfig;
+      appendHttpConfig = hisilome.nginxHttpConfig;
 
       virtualHosts.${cfg.domain} = {
         enableACME = cfg.enableACME;
@@ -49,7 +48,7 @@ in {
           ${securityHeaders}
         '';
 
-        locations = cell.packages.nginxLocations {
+        locations = hisilome.nginxLocations {
           stateDir = radioState;
           extraHeaders = securityHeaders;
         };

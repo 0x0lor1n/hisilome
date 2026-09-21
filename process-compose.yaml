@@ -6,7 +6,7 @@ processes:
     command: |
       mkdir -p radio/state/logs
       if [ -z "$(find music -type f -print -quit 2>/dev/null)" ]; then
-        echo "check-music: no files under cells/hisilome/music/ (gitignored; rsync it in)." >&2
+        echo "check-music: no files under music/ (gitignored; rsync it in)." >&2
         exit 1
       fi
 
