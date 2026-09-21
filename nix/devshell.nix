@@ -22,15 +22,14 @@ pkgs.mkShellNoCC {
       listener-count
       dev-nginx
       build-site
-      dev-site
       station-online
       station-offline
     ]);
 
   shellHook = ''
-    echo "dev-site                                     build + nginx :8099 + rebuild on change (use this, not zola serve)"
     echo "build-site                                   d2 -> svg next to each post, then zola build into public/ (SITE_DRAFTS=0 to hide drafts)"
-    echo "process-compose up -f process-compose.yaml   local stack: icecast+liquidsoap+nginx"
+    echo "process-compose up -f process-compose.yaml   local stack: build-site + nginx :8099 + icecast + liquidsoap"
+    echo "  ... -f process-compose.dev.yaml            + rebuild on change, restart liquidsoap on radio.liq edits"
     echo "tag-replaygain music                         write ReplayGain tags (-n to preview)"
     echo "tag-album music                              write ALBUM tags from [bracket] prefixes"
     echo "build-queue music                            rebuild the play queue + schedule"

@@ -320,24 +320,6 @@ in {
     SITE_DRAFTS=0 ${build-site}/bin/build-site --output-dir $out
   '';
 
-  # Preview through the same nginx config as prod (SSI, fragments, headers).
-  # `zola serve` does none of that: the SSI comments leak into the page as text.
-  dev-site = pkgs.writeShellApplication {
-    name = "dev-site";
-    runtimeInputs = [build-site dev-nginx pkgs.watchexec pkgs.coreutils];
-    text = ''
-      build-site
-      dev-nginx &
-      trap 'kill $!' EXIT
-      echo "site: http://localhost:8099 (stream/console 502 unless the station is up)"
-      exec watchexec \
-        --watch content --watch templates --watch static --watch syntaxes --watch config.toml \
-        --ignore 'content/**/*.svg' \
-        --debounce 300ms --on-busy-update=queue \
-        -- build-site
-    '';
-  };
-
   tag-replaygain = mkScript "tag-replaygain" (
     with pkgs; [
       ffmpeg

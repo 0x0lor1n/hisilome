@@ -24,14 +24,14 @@ Everything here is relative to the repo root (`radio/state/`, `music/`,
 ```sh
 nix build            # ./result = the rendered site (packages.default = site)
 nix develop          # zola, d2, ffmpeg, flac, icecast, liquidsoap, process-compose + the scripts
-dev-site             # build, serve on :8099 through the prod nginx config, rebuild on change
 build-site           # d2 → svg, then zola build into public/ (SITE_DRAFTS=0 hides drafts)
-process-compose up -f process-compose.yaml   # local station: icecast + liquidsoap + nginx
+process-compose up -f process-compose.yaml   # site on :8099 through the prod nginx config + icecast + liquidsoap
+process-compose up -f process-compose.yaml -f process-compose.dev.yaml   # same, plus rebuild on change
 ```
 
 `direnv allow` loads the shell automatically (`.envrc` = `use flake`).
 
-Use `dev-site`, not `zola serve`: the pages carry SSI includes that only
+Use `process-compose`, not `zola serve`: the pages carry SSI includes that only
 nginx resolves.
 
 ## Consuming the module

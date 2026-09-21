@@ -72,7 +72,6 @@
 
   /* glows, as rgb triples so they can take an alpha */
   --accent-rgb: 152, 187, 108;
-  --sakura-rgb: 210, 126, 153;
   --link-rgb: 126, 156, 216;
   --carp-rgb: 230, 195, 132;
 
@@ -537,22 +536,6 @@ del {
   color: var(--meta);
 }
 
-.footnotes {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-  font-size: 0.85rem;
-  color: var(--meta);
-}
-
-.footnotes hr {
-  display: none;
-}
-
-.footnote-back {
-  margin-left: 0.3rem;
-}
-
 pre code {
   display: block;
   /* extra top room for the corner tabs */
@@ -697,15 +680,6 @@ main li > strong:first-child {
 footer {
   color: var(--meta);
   font-size: 0.85rem;
-}
-
-.neon-audio {
-  flex: 0 0 auto;
-  width: 130px;
-  outline: none;
-  border-radius: 4px;
-  /* No invert filter: color-scheme:dark already darkens native controls, and
-     stacking a filter on top made them read as flat grey. */
 }
 
 
