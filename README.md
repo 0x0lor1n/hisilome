@@ -68,3 +68,8 @@ store; `null` keeps the loopback-only dev password), `queueRounds`.
 
 The host side — certificate e-mail, firewall, persistence of the ACME state,
 `www.` alias — is the consumer's.
+
+## License
+
+Code — [AGPL-3.0-or-later](LICENSE). Texts under `content/` —
+[CC BY-SA 4.0](content/LICENSE). Music is not in the repository.
