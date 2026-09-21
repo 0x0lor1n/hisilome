@@ -258,4 +258,4 @@ The station layout is a tribute to [lainonlife](https://github.com/barrucadu/lai
 
 I know what the counter is for. It is for the version of this where the number is not one. That is not an answer to what he asked.
 
-Config, liquidsoap script and nginx module: [the-hive/cells/hisilome](https://github.com/0x0lor1n/the-hive/tree/main/cells/hisilome).
+Config, liquidsoap script and nginx module: [0x0lor1n/hisilome](https://github.com/0x0lor1n/hisilome).

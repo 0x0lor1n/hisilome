@@ -2,15 +2,13 @@
 # derivation, built off-host) and tag-music (run on the workstation before
 # rsync; ReplayGain tags travel inside the files).
 {
-  inputs,
-  cell,
-}: {
   config,
   lib,
   pkgs,
   ...
 }: let
   cfg = config.services.hisilome;
+  hisilome = import ../packages.nix pkgs;
   runtime = cfg.stateDir;
   radioState = "${runtime}/radio/state";
 
@@ -32,7 +30,7 @@
   emptyTolerantQueue = pkgs.writeShellApplication {
     name = "build-queue-if-music";
     runtimeInputs = [
-      cell.packages.build-queue
+      hisilome.build-queue
       pkgs.findutils
       pkgs.coreutils
     ];
@@ -120,9 +118,9 @@ in {
           # status.html: empty while up, the offline <style> otherwise. The
           # shell SSI-includes it; ExecStopPost runs on crash and stop alike,
           # so a dead liquidsoap hides the player without any client logic.
-          ExecStartPre = "${cell.packages.station-online}/bin/station-online";
+          ExecStartPre = "${hisilome.station-online}/bin/station-online";
           ExecStart = "${pkgs.liquidsoap}/bin/liquidsoap ${runtime}/radio/radio.liq";
-          ExecStopPost = "${cell.packages.station-offline}/bin/station-offline";
+          ExecStopPost = "${hisilome.station-offline}/bin/station-offline";
           EnvironmentFile = "${radioState}/source.env";
           User = cfg.user;
           Group = cfg.group;
@@ -140,7 +138,7 @@ in {
       environment.OUT = "radio/state/listeners.txt";
       serviceConfig =
         {
-          ExecStart = "${cell.packages.listener-count}/bin/listener-count";
+          ExecStart = "${hisilome.listener-count}/bin/listener-count";
           EnvironmentFile = "${radioState}/admin.env";
           User = cfg.user;
           Group = cfg.group;

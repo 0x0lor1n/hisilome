@@ -1,8 +1,5 @@
 # Assembles stateDir and renders icecast.xml with the passwords.
 {
-  inputs,
-  cell,
-}: {
   config,
   lib,
   pkgs,
@@ -12,15 +9,15 @@
   runtime = cfg.stateDir;
   radioState = "${runtime}/radio/state";
 
-  # Own store path per file. `inputs.self + "/cells/..."` would make the
-  # toplevel depend on the whole flake source and re-push a 4 GiB closure on
-  # every unrelated edit (measured).
+  # Own store path per file. `self + "/radio/..."` would make the toplevel
+  # depend on the whole flake source and re-push a 4 GiB closure on every
+  # unrelated edit (measured).
   radioLiq = builtins.path {
-    path = ../radio/radio.liq;
+    path = ../../radio/radio.liq;
     name = "radio.liq";
   };
   icecastXml = builtins.path {
-    path = ../radio/icecast.xml;
+    path = ../../radio/icecast.xml;
     name = "icecast.xml";
   };
 in {

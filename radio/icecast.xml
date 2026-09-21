@@ -11,7 +11,7 @@
         <burst-size>131072</burst-size>   <!-- 128 KiB = 8.192s at 128 kbps -->
     </limits>
     <!-- Dev values; safe only while <bind-address> is 127.0.0.1. Production
-         renders real ones in (nixosModules/setup.nix). -->
+         renders real ones in (nix/modules/setup.nix). -->
     <authentication>
         <source-password>hackme</source-password>
         <relay-password>hackme</relay-password>
