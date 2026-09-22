@@ -1,5 +1,5 @@
 {
-  description = "Hísilómë — the Zola site and the radio station behind hisilo.me";
+  description = "Hísilómë - the Zola site and the radio station behind hisilo.me";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 

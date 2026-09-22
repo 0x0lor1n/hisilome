@@ -11,13 +11,15 @@ ignore(file.mkdir(perms=0o755, "radio/state/tmp-schedule"))
 stream_latency = 131072. / (128000. / 8.)   # 128 KiB at 128 kbps = 8.192s
 
 # "[Album] - NN Artist - Title.ext" or "kebab-case-name.ext". Fallback for
-# untagged files; keeps the artist/title split as an em dash.
+# untagged files; keeps the artist/title split as " - " while the kebab pass
+# below turns every other hyphen into a space (a tab holds the place).
 def derive_title(filename) =
   name = path.basename(path.remove_extension(filename))
   name = string.replace(pattern="^\\[[^]]*\\][ ]*-[ ]*", fun (_) -> "", name)
   name = string.replace(pattern="^[0-9]+[ ]*-?[ ]*", fun (_) -> "", name)
-  name = string.replace(pattern="[ ]+-[ ]+", fun (_) -> " — ", name)
+  name = string.replace(pattern="[ ]+-[ ]+", fun (_) -> "\t", name)
   name = string.replace(pattern="[-_]", fun (_) -> " ", name)
+  name = string.replace(pattern="\t", fun (_) -> " - ", name)
   name = string.replace(pattern=" +", fun (_) -> " ", name)
   name = string.trim(name)
   string.capitalize(space_sensitive=true, name)
@@ -40,6 +42,8 @@ end
 current_title = ref("")
 current_album = ref("")
 current_index = ref(-1)
+# Queue index the schedule fragment was last built for; see write_console.
+schedule_index = ref(-1)
 
 # "<seconds>\t<path>\t<album>" in play order, written by bin/build-queue.
 def queue_rows() =
@@ -77,7 +81,7 @@ def write_now_playing(m) =
   title =
     if tagged == "" then derive_title(m["filename"])
     elsif artist == "" then tagged
-    else "#{artist} — #{tagged}"
+    else "#{artist} - #{tagged}"
     end
   current_title := title
   album = m["album"]
@@ -126,7 +130,7 @@ radio = normalize_track_gain(radio)
 radio = amplify(0.5, radio)
 
 radio = mksafe(radio)
-radio.on_metadata(synchronous=true, write_now_playing)
+# on_metadata is attached below write_schedule: the handler calls both.
 
 # Production supplies ICECAST_SOURCE_PASSWORD via systemd EnvironmentFile; the
 # default matches radio/icecast.xml for the loopback-only dev stack.
@@ -190,17 +194,15 @@ def write_console() =
       end
     # Step counts are literals: var() inside steps() does not reliably parse.
     esec = int_of_float(el)
-    tmin = int_of_float(du) / 60
     smod = esec mod 60
 
+    # Both digits are fixed 60-step animations; where in the track we are is a
+    # negative delay, same as the bar. Minutes tick once per 60s of wall time.
     elapsed_html =
       if du <= 0. then
         ''
-      elsif tmin < 1 then
-        # under a minute: no minute steps to animate, so the digit is static
-        '<span class="rc-m rc-static">0</span>:<span class="rc-s" style="animation: rc-sec 60s steps(60) -' ^ string(smod) ^ 's infinite"></span>'
       else
-        '<span class="rc-m" style="--tm:' ^ string(tmin) ^ ';animation: rc-min ' ^ string(tmin * 60) ^ 's steps(' ^ string(tmin) ^ ') -' ^ string(esec) ^ 's forwards"></span>' ^
+        '<span class="rc-m" style="animation: rc-min 3600s steps(60) -' ^ string(esec) ^ 's forwards"></span>' ^
         ':<span class="rc-s" style="animation: rc-sec 60s steps(60) -' ^ string(smod) ^ 's infinite"></span>'
       end
 
@@ -242,8 +244,7 @@ def write_console() =
     log.important(label="write_console", "write failed; will retry next tick")
   end
 end
-
-thread.run(every=1., write_console)
+# The 1 s tick is started after write_schedule below: it drives both.
 
 # Schedule offsets are arithmetic over queue.tsv durations, re-anchored to the
 # listener position every cycle.
@@ -311,10 +312,33 @@ def write_schedule() =
       write = file.write.stream(atomic=true, temp_dir="radio/state/tmp-schedule", "radio/state/schedule.html")
       write(html)
       write(null)
+      schedule_index := here
     end
   catch _ do
     log.important(label="write_schedule", "write failed; will retry next tick")
   end
 end
 
+# Write the schedule as soon as the encoder switches, so a restart does not
+# leave the previous instance's file - built from a queue that has since been
+# reshuffled - on the page until the first timer tick. At that instant the
+# listener is still stream_latency behind, on the previous track, and
+# listener_pos() rightly keeps "now" there. Nothing used to move it on until
+# the 10 s timer, so the list lagged the title by up to 10 s; the 1 s tick
+# below catches the audible switch and rewrites the schedule the same second
+# the console flips.
+def on_track_change(m) =
+  write_now_playing(m)
+  write_schedule()
+end
+radio.on_metadata(synchronous=true, on_track_change)
+
+def tick() =
+  let (idx, _, _) = listener_pos()
+  if idx != schedule_index() then write_schedule() end
+  write_console()
+end
+thread.run(every=1., tick)
+
+# The "in N mins" words still need refreshing between switches.
 thread.run(every=10., write_schedule)

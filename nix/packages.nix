@@ -151,7 +151,7 @@ pkgs: let
   # Zola pages end in "/", so assets and streams are untouched. Clients without
   # Sec-Fetch-Dest (curl, crawlers, old Safari) get the bare page.
   # `volatile`: a subrequest shares its parent's variable cache, and the
-  # shell's SSI include of <page>/meta.html goes through `/`'s try_files —
+  # shell's SSI include of <page>/meta.html goes through `/`'s try_files -
   # with the cached value that served the shell again, forever.
   nginxHttpConfig = ''
     map "$http_sec_fetch_dest$uri" $shell_page {
