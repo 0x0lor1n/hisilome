@@ -3,7 +3,7 @@
    from style.css into templates/live.html. The frame inlines its CSS because
    it reloads every ten seconds and a linked stylesheet painted an unstyled
    frame on each reload (the flicker). Nothing in the shell uses .rc-body,
-   .rc-title, .rc-bar, .rc-fill, .rc-clock — the console's own classes
+   .rc-title, .rc-bar, .rc-fill, .rc-clock - the console's own classes
    (.rc-br, .rc-on) stay in style.css. */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

@@ -14,8 +14,8 @@ Everything here is relative to the repo root (`radio/state/`, `music/`,
 | `content/ templates/ static/ syntaxes/ config.toml` | the Zola site; `.d2` diagrams live next to their post |
 | `radio/`                   | `radio.liq`, `icecast.xml`; `radio/state/` is runtime (gitignored)  |
 | `bin/`                     | station scripts, wrapped as packages by `nix/packages.nix`          |
-| `music/`                   | the library — gitignored, rsync it in                               |
-| `nix/packages.nix`         | `pkgs: { site, build-site, … }` — every derivation, one file        |
+| `music/`                   | the library - gitignored, rsync it in                               |
+| `nix/packages.nix`         | `pkgs: { site, build-site, … }` - every derivation, one file        |
 | `nix/modules/`             | the NixOS module (`services.hisilome.*`)                            |
 | `nix/devshell.nix`         | the dev shell                                                       |
 
@@ -58,7 +58,7 @@ inputs.hisilome = {
 
 The module builds the site with the *host's* `pkgs`, not this flake's
 `nixpkgs` input, so a consumer never carries two nixpkgs. This flake's own
-pin only serves standalone `nix build` / `nix develop` — keep it on the same
+pin only serves standalone `nix build` / `nix develop` - keep it on the same
 rev as the consumer if you want the two `site` outputs byte-identical.
 
 Options: `enable`, `domain`, `enableACME` (default `true`), `stateDir`
@@ -66,10 +66,10 @@ Options: `enable`, `domain`, `enableACME` (default `true`), `stateDir`
 `sourcePasswordFile`/`adminPasswordFile` (read at unit start, never in the
 store; `null` keeps the loopback-only dev password), `queueRounds`.
 
-The host side — certificate e-mail, firewall, persistence of the ACME state,
-`www.` alias — is the consumer's.
+The host side - certificate e-mail, firewall, persistence of the ACME state,
+`www.` alias - is the consumer's.
 
 ## License
 
-Code — [AGPL-3.0-or-later](LICENSE). Texts under `content/` —
+Code - [AGPL-3.0-or-later](LICENSE). Texts under `content/` -
 [CC BY-SA 4.0](content/LICENSE). Music is not in the repository.

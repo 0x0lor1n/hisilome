@@ -317,8 +317,8 @@ end
 
 # Write the schedule in the same instant as the title, not up to 10 s later.
 # On a restart the first timer tick lands before any metadata (current_index is
-# still -1, so write_schedule skips), and the previous instance's file — built
-# from a queue that has since been reshuffled — stays on the page until the
+# still -1, so write_schedule skips), and the previous instance's file - built
+# from a queue that has since been reshuffled - stays on the page until the
 # second tick. listener_pos() still holds "now" on the previous track under
 # stream_latency, so both fragments agree with the console to the second.
 def on_track_change(m) =

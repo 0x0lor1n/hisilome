@@ -841,8 +841,8 @@ body.framed {
 
 /* Retro loader, painted on the frame itself. Off by default: hiding it under
    an opaque .rc-bar in live.html meant guessing the bar's y to the pixel, and
-   it peeked out (rounding, fonts). Instead /status.html — written by the
-   station unit's ExecStopPost — is SSI-included into <head> while the radio
+   it peeked out (rounding, fonts). Instead /status.html - written by the
+   station unit's ExecStopPost - is SSI-included into <head> while the radio
    is down and sets --station-ui / --ld-image / --ld-anim; only then the
    segments crawl where the bar would be, and the player row is hidden.
    SSI cannot add a class, hence properties. The include IS the switch. */
