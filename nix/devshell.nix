@@ -14,6 +14,7 @@ pkgs.mkShellNoCC {
       liquidsoap
       process-compose
       watchexec
+      libresprite # static/img/*.png sprites
     ])
     ++ (with hisilome; [
       tag-replaygain
@@ -33,6 +34,7 @@ pkgs.mkShellNoCC {
     echo "tag-replaygain music                         write ReplayGain tags (-n to preview)"
     echo "tag-album music                              write ALBUM tags from [bracket] prefixes"
     echo "build-queue music                            rebuild the play queue + schedule"
+    echo "libresprite static/img/olorin.png            edit the dialogue sprites (48x48, keep the palette)"
     echo
     echo "NOTE: run these from the repo root -- the configs use relative paths."
   '';
