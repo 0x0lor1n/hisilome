@@ -14,6 +14,7 @@ pkgs.mkShellNoCC {
       liquidsoap
       process-compose
       watchexec
+      libresprite # static/img/*.png sprites
     ])
     ++ (with hisilome; [
       tag-replaygain
@@ -28,11 +29,12 @@ pkgs.mkShellNoCC {
 
   shellHook = ''
     echo "build-site                                   d2 -> svg next to each post, then zola build into public/ (SITE_DRAFTS=0 to hide drafts)"
-    echo "process-compose up -f process-compose.yaml   local stack: build-site + nginx :8099 + icecast + liquidsoap"
-    echo "  ... -f process-compose.dev.yaml            + rebuild on change, restart liquidsoap on radio.liq edits"
+    echo "process-compose up -f process-compose.yaml   local stack: build-site (+ rebuild on change) + nginx :8099 + icecast + liquidsoap"
+    echo "  ... -f process-compose.dev.yaml            + restart liquidsoap on radio.liq edits"
     echo "tag-replaygain music                         write ReplayGain tags (-n to preview)"
     echo "tag-album music                              write ALBUM tags from [bracket] prefixes"
     echo "build-queue music                            rebuild the play queue + schedule"
+    echo "libresprite static/img/olorin.png            edit the dialogue sprites (48x48, keep the palette)"
     echo
     echo "NOTE: run these from the repo root -- the configs use relative paths."
   '';

@@ -11,24 +11,28 @@ The dedicated radio page on this site is showing: what's playing now, progress b
 Here the `Content-Security-Policy` is `default-src 'none'` plus fonts, styles,
 images and media. No `script-src`, because there is nothing to allow.
 
-> **KRITON.** Nothing to allow.
->
-> **0x0lor1n.** Nothing. Zero. The browser is not permitted to run a single line of
-> script on that page and it still ticks.
->
-> **KRITON.** You sound like a man who has won something.
+{% dialogue() %}
+KRITON. Nothing to allow.
+
+0x0lor1n. Nothing. Zero. The browser is not permitted to run a single line of
+script on that page and it still ticks.
+
+KRITON. You sound like a man who has won something.
+{% end %}
 
 To be fair nobody forced me. I did not start my car with a position "fuck javascript man". I wanted to know how much live page you can pack on the server and CSS, so client will not have to run any code at all. For this site - it's possible. It uses seven tricks, but none of them is new - just never seen them together in one example.
 
 Zola - builds static pages of site, liquidsoap + icecast - runs radio station + provides the stream to Icecast, nginx - serves all that stuff to end-users all is configured with just one nixos module and one process-compose.yaml for development loop.
 
 
-> **KRITON.** Seven. You are going to walk me through seven.
->
-> **0x0lor1n.** Yep. Nothing here is new, I want that on the record. I just had not
-> seen them in one place before.
->
-> **KRITON.** Then go.
+{% dialogue() %}
+KRITON. Seven. You are going to walk me through seven.
+
+0x0lor1n. Yep. Nothing here is new, I want that on the record. I just had not
+seen them in one place before.
+
+KRITON. Then go.
+{% end %}
 
 ## 1. The server renders HTML, because there is no client to render JSON
 
@@ -48,26 +52,30 @@ It all comes down to nginx aggregating pieces of it with help of ssi, which is a
 <!--# include virtual="/state/now-playing.txt" -->
 ```
 
-> **KRITON.** From the nineties.
->
-> **0x0lor1n.** 1996 or so. It shipped, everyone moved on, it never left. It is sitting
-> in every nginx build on earth doing nothing.
->
-> **KRITON.** And this pleases you more than if it were new.
->
-> **0x0lor1n.** Man, obviously.
+{% dialogue() %}
+KRITON. From the nineties.
+
+0x0lor1n. 1996 or so. It shipped, everyone moved on, it never left. It is sitting
+in every nginx build on earth doing nothing.
+
+KRITON. And this pleases you more than if it were new.
+
+0x0lor1n. Man, obviously.
+{% end %}
 
 ## 2. The bar moves between refreshes
 
 It's about one ~2KB request each ten seconds from each listener. For the abusive (~DoS) case just use limit_req and that's it.
 
-> **KRITON.** Two kilobytes. Every ten seconds. Per person.
->
-> **0x0lor1n.** Per person.
->
-> **KRITON.** How many persons.
->
-> **0x0lor1n.** We will get to that.
+{% dialogue() %}
+KRITON. Two kilobytes. Every ten seconds. Per person.
+
+0x0lor1n. Per person.
+
+KRITON. How many persons.
+
+0x0lor1n. We will get to that.
+{% end %}
 
 So 10sec interval is too big for a progress bar to look like it's moving However in css animations there is such thing animation-delay property and if you specify a negative value, then the animation starts partway through its cycle instead of from the beginning. Liquidsoap writes both the overall duration of current track + the offset time into the fragment as CSS custom properties.
 
@@ -77,20 +85,22 @@ So 10sec interval is too big for a progress bar to look like it's moving However
 
 So basically the bar starts at 87 seconds out of 213 and ends at the same moment when the track ends. Then once the frame gets reloaded ten seconds later it has new values for duration/elapsed time, so the bar falls within ~one frame accuracy on the place where it arrived by itself, so there is no visible jump.
 
-> **KRITON.** The bar does not know what the music is doing.
->
-> **0x0lor1n.** No. It is dead reckoning. It gets told where it is every ten seconds
-> and guesses in between.
->
-> **KRITON.** So it can be wrong.
->
-> **0x0lor1n.** If the stream stutters it drifts, up to ten seconds, until the next
-> fragment straightens it out.
->
-> **KRITON.** And the listener sees a bar that is confidently in the wrong place.
->
-> **0x0lor1n.** The listener sees a bar that is mostly right and does not cost them a
-> WebSocket. Can you trash it a bit harder, I am taking notes.
+{% dialogue() %}
+KRITON. The bar does not know what the music is doing.
+
+0x0lor1n. No. It is dead reckoning. It gets told where it is every ten seconds
+and guesses in between.
+
+KRITON. So it can be wrong.
+
+0x0lor1n. If the stream stutters it drifts, up to ten seconds, until the next
+fragment straightens it out.
+
+KRITON. And the listener sees a bar that is confidently in the wrong place.
+
+0x0lor1n. The listener sees a bar that is mostly right and does not cost them a
+WebSocket. Can you trash it a bit harder, I am taking notes.
+{% end %}
 
 ## 3. The clock is the same trick, one level uglier
 
@@ -110,11 +120,13 @@ Minutes run with `steps(N)` over N*60 seconds, seconds with `steps(60)` over 60s
 
 `prefers-reduced-motion: reduce` sets `animation-play-state: paused` on all of it. The bar still shows the right position, because a paused animation stays at its delayed start point.
 
-> **KRITON.** You animate a number you cannot see, and then you show it.
->
-> **0x0lor1n.** That is exactly it.
->
-> **KRITON.** Is that clever or is that a workaround.
+{% dialogue() %}
+KRITON. You animate a number you cannot see, and then you show it.
+
+0x0lor1n. That is exactly it.
+
+KRITON. Is that clever or is that a workaround.
+{% end %}
 
 ## 4. The widget reloads itself, and two details cost me an evening
 
@@ -126,16 +138,18 @@ It rly just reloads itself with a meta refresh in ten second interval. All the w
 - `background: transparent` on the frame body, so the console shows through and
   the frame is not a visible rectangle sitting on the page.
 
-> **KRITON.** An evening for two lines.
->
-> **0x0lor1n.** An evening for finding out it was two lines. I was staring at a flicker
-> I could not reproduce on demand. You sit there refreshing and waiting to catch
-> it, and it happens when you look away.
->
-> **KRITON.** What did you do while you waited.
->
-> **0x0lor1n.** Put on Nas. Illmatic, the whole thing. Did you know NY State of Mind
-> was recorded on the first take? Goat level.
+{% dialogue() %}
+KRITON. An evening for two lines.
+
+0x0lor1n. An evening for finding out it was two lines. I was staring at a flicker
+I could not reproduce on demand. You sit there refreshing and waiting to catch
+it, and it happens when you look away.
+
+KRITON. What did you do while you waited.
+
+0x0lor1n. Put on Nas. Illmatic, the whole thing. Did you know NY State of Mind
+was recorded on the first take? Goat level.
+{% end %}
 
 ## 5. The player survives navigation
 
@@ -156,22 +170,24 @@ When a request comes from a curl like client, robot or rss reader, old safari ve
 
 Sec-Fetch-Dest works like a server-side media query: same URL, different skin of the page, depending on where you include it from.
 
-> **KRITON.** And the address in the window?
->
-> **0x0lor1n.** Ah.
->
-> **KRITON.** Ah.
->
-> **0x0lor1n.** The address bar never changes. You navigate inside the frame, the bar
-> stays where you came in. Reload gives you the right page, the shell reads the
-> real request URI. But copy the address after a few clicks and you hand someone
-> the wrong post.
->
-> **KRITON.** You knew this and shipped it.
->
-> **0x0lor1n.** I knew it and shipped it.
->
-> **KRITON.** Why is that acceptable to you?
+{% dialogue() %}
+KRITON. And the address in the window?
+
+0x0lor1n. Ah.
+
+KRITON. Ah.
+
+0x0lor1n. The address bar never changes. You navigate inside the frame, the bar
+stays where you came in. Reload gives you the right page, the shell reads the
+real request URI. But copy the address after a few clicks and you hand someone
+the wrong post.
+
+KRITON. You knew this and shipped it.
+
+0x0lor1n. I knew it and shipped it.
+
+KRITON. Why is that acceptable to you?
+{% end %}
 
 ## 6. The files panel: the browser keeps the state, CSS reads it
 
@@ -190,14 +206,16 @@ The d2 diagrams in fiber post are not "embedded" as images. It's a Zola shortcod
 
 It's not exactly a no-JS trick, but it's the same spirit: do everything at build time, so what you ship is a document, not a viewer app.
 
-> **KRITON.** You said seven.
->
-> **0x0lor1n.** This one is not a trick, it is a habit. Do the work at build time, ship
-> a document, not a viewer. Same church, different pew.
->
-> **KRITON.** So eight.
->
-> **0x0lor1n.** Seven and a habit.
+{% dialogue() %}
+KRITON. You said seven.
+
+0x0lor1n. This one is not a trick, it is a habit. Do the work at build time, ship
+a document, not a viewer. Same church, different pew.
+
+KRITON. So eight.
+
+0x0lor1n. Seven and a habit.
+{% end %}
 
 ## 7. Copy without a copy button
 
@@ -213,14 +231,16 @@ The "Copy" tab on a corner of a code block is just a CSS ::after pseudo element.
 
 The lang tab on the left has similar approach - content: attr(data-lang) on ::before pseudo element to get the language name from the attribute that is set by default by Zola on `<code>` element.
 
-> **KRITON.** So the button does not copy.
->
-> **0x0lor1n.** The button selects. You copy. It says so on the button once you press
-> it.
->
-> **KRITON.** A button that tells you it is not going to do the thing.
->
-> **0x0lor1n.** A button that tells you the truth!
+{% dialogue() %}
+KRITON. So the button does not copy.
+
+0x0lor1n. The button selects. You copy. It says so on the button once you press
+it.
+
+KRITON. A button that tells you it is not going to do the thing.
+
+0x0lor1n. A button that tells you the truth!
+{% end %}
 
 ## What it cost
 
@@ -239,20 +259,22 @@ The lang tab on the left has similar approach - content: attr(data-lang) on ::be
 
 The console has a listener count on it. It is a real number, icecast reports it, liquidsoap writes it into the fragment every ten seconds.
 
-> **KRITON.** You said we would get to how many persons.
->
-> **0x0lor1n.** It varies.
->
-> **KRITON.** What is it right now.
->
-> **0x0lor1n.** One.
->
-> **KRITON.** And that one is you.
->
-> **0x0lor1n.** Yes.
->
-> **KRITON.** So you built a page that tells you, every ten seconds, and precisely,
-> that nobody is listening.
+{% dialogue() %}
+KRITON. You said we would get to how many persons.
+
+0x0lor1n. It varies.
+
+KRITON. What is it right now.
+
+0x0lor1n. One.
+
+KRITON. And that one is you.
+
+0x0lor1n. Yes.
+
+KRITON. So you built a page that tells you, every ten seconds, and precisely,
+that nobody is listening.
+{% end %}
 
 The station layout is a tribute to [lainonlife](https://github.com/barrucadu/lainonlife). The shell-prompt navigation (`$ cd ./archive ./series ./tags`) is lifted from [geanmar.com](https://geanmar.com/). The frame trick is nothing new, we did SPAs like that before the word existed.
 

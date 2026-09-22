@@ -1,21 +1,10 @@
 version: "0.5"
 
 # Dev overlay: process-compose up -f process-compose.yaml -f process-compose.dev.yaml
+# Site rebuilds live in the main file; this only adds the liquidsoap restarter.
 # A separate file, not a flag: process-compose has no profile mechanism, and a
 # file you have to name cannot start by accident.
 processes:
-  # queue, not restart: a build killed halfway leaves public/ half-written.
-  watch-site:
-    command: >
-      watchexec
-      --watch content --watch templates --watch static --watch syntaxes --watch config.toml
-      --ignore 'content/**/*.svg'
-      --debounce 300ms --on-busy-update=queue
-      -- build-site
-    depends_on:
-      build-site:
-        condition: process_completed_successfully
-
   # Liquidsoap has no reload; the stream drops for ~1s and listeners reconnect.
   watch-radio:
     command: >
