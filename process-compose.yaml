@@ -16,6 +16,20 @@ processes:
   build-site:
     command: "build-site"
 
+  # Rebuild public/ on edits; nginx serves the directory, so no reload needed.
+  # zola serve is not used: it drops the SSI fragments the console relies on.
+  # queue, not restart: a build killed halfway leaves public/ half-written.
+  watch-site:
+    command: >
+      watchexec
+      --watch content --watch templates --watch static --watch syntaxes --watch config.toml
+      --ignore 'content/**/*.svg'
+      --debounce 300ms --on-busy-update=queue
+      -- build-site
+    depends_on:
+      build-site:
+        condition: process_completed_successfully
+
   # No-op on an unchanged library; keeps liquidsoap from analysing at resolve
   # time (~5s per track).
   tag-music:
