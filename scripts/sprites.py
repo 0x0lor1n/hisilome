@@ -89,72 +89,62 @@ KRITON = [
     "                                                ",
 ]
 
-# 0x0lor1n: hand-placed, 3/4 view facing the text, no face. 1px outline,
-# terminal-green where it borders transparency (the outer silhouette, incl.
-# diagonals) and near-black on interior edges; three tones of navy on the
-# hoodie so the form holds on the dark site background; inside the hood is
-# pure black. Lid of the laptop faces the reader, one pale logo.
+# 0x0lor1n: pixel map lifted 1:1 from the green-hacker reference (44x41, centred
+# on the 48x48 canvas). Black hooded silhouette, green hatching on hood and
+# shoulders, empty black face, lilac laptop lid with a pale screen glow.
 OLORIN_PAL = {
-    "O": (0x0A, 0x0A, 0x10),  # interior outline
-    "G": (0x3C, 0xD6, 0x3A),  # outer contour, terminal green
-    "1": (0x23, 0x25, 0x3C),  # hoodie, back / shadow
-    "d": (0x17, 0x18, 0x28),  # fold in the hood
-    "2": (0x34, 0x38, 0x56),  # hoodie, mid
-    "3": (0x48, 0x4E, 0x74),  # hoodie, lit front
-    "K": (0x06, 0x06, 0x0A),  # inside the hood
+    "K": (0x0E, 0x0E, 0x0E),  # silhouette
+    "G": (0x3C, 0xD6, 0x3A),  # green bright
+    "g": (0x1F, 0x8F, 0x28),  # green dim
     "l": (0x6B, 0x5C, 0x80),  # laptop lid
     "L": (0x9A, 0x8B, 0xB0),  # laptop edge highlight
-    "W": (0xCF, 0xE6, 0xF3),  # logo
+    "W": (0xCF, 0xE6, 0xF3),  # screen glow
 }
 OLORIN = [
-    "                                                ",
-    "                                                ",
-    "                   GGGG                         ",
-    "                 GG1111GG                       ",
-    "                G1d111111G                      ",
-    "               G1d11111112G                     ",
-    "              G1d1111111222G                    ",
-    "             G1d111111122222G                   ",
-    "            G1d11111112OOOO22G                  ",
-    "            G1d1111112OKKKKKO2G                 ",
-    "           G11d11111OKKKKKKKO22G                ",
-    "           G1d11111OKKKKKKKKKO2G                ",
-    "           G1d1111OKKKKKKKKKKO22G               ",
-    "           G111111OKKKKKKKKKKKO2G               ",
-    "           G111111OKKKKKKKKKKKO23G              ",
-    "           G111111OKKKKKKKKKKKKO3G              ",
-    "           G111111OKKKKKKKKKKKKO3G              ",
-    "           G111112OKKKKKKKKKKKKO3G              ",
-    "           G111112OKKKKKKKKKKKKO3G              ",
-    "            G11122OKKKKKKKKKKKKO3G              ",
-    "            G11122OKKKKKKKKKKKKO3G              ",
-    "             G1122OKKKKKKKKKKKKO3G              ",
-    "             G1122OKKKKKKKKKKKO3G               ",
-    "              G122OKKKKKKKKKKO3G                ",
-    "               G22OOOOOOOOOOO33G                ",
-    "          GG111222222222222333333GG             ",
-    "        GG11112222222222222233333333GG          ",
-    "      GG111112222222222222222333333333GG        ",
-    "     G1111112222222222222222233333333333G       ",
-    "    G11111122222222222222222233333333333G       ",
-    "   G11111122222222222222222223333333333322G     ",
-    "  G11111122222222222222222223333OOOL333222G     ",
-    "  G111111222222222222222222OOOOOllOL3333222G    ",
-    "  G111111222222222222OOOOOOlllllllOL3333222G    ",
-    "  G1111112222222OOOOOlllllllllllllOL3333222G    ",
-    "  G1111112222OOOllllllllllllllllllOL3333222G    ",
-    "  G1111112222OllllllllllllllllllllOL3333222G    ",
-    "  G1111112222OllllllllllllWWWlllllOL3333222G    ",
-    "  G1111112222OllllllllllllWWWlllllOL3333222G    ",
-    "  G1111112222OllllllllllllWWWlllllOL3333222G    ",
-    "  G1111112222OllllllllllllllllllllOL3333222G    ",
-    "  G1111112222OllllllllllllllllllllOL3333222G    ",
-    "  G1111112222OllllllllllllllllllllOL3333222G    ",
-    "  G1111112222OOOOOOOOOOOllllllllllOL3333222G    ",
-    "  G1111112222LLLLLLLLLLLOOOOOOOOOOOL3333222G    ",
-    "  G1111112222LLLLLLLLLLLLLLLLLLLLLLLL333222G    ",
-    "   GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG    ",
-    "                                                ",
+    "                                            ",
+    "                                            ",
+    "                  KKgKKgKG                  ",
+    "                 KgKKKgKgKG                 ",
+    "                gKKKKKKKKgKG                ",
+    "               gKKGKKGKKgKGKG               ",
+    "               gKKKKKKKgKgKGG               ",
+    "               gKKKKKKKKKKgKg               ",
+    "              GKKKKKKgKKKKKKKG              ",
+    "             GKKKKKKKKKKKKKKKK              ",
+    "             GgKKKKKKKKKKKKKKG              ",
+    "             GKKKgGGGGGGGGKKKK              ",
+    "             GKKKKKKKKKKKKGKKK              ",
+    "             GKKgKKKKKKKKKKGKK              ",
+    "             GKgKKKKKKKKKKGKGK              ",
+    "             GKKKKKKKKKKKKGKgg              ",
+    "              GKKgKKKKKKKgKKKG              ",
+    "              GKKgKKKKKKKgKKKG              ",
+    "               gKKGKKKKKgKKKG               ",
+    "              GKgKKGKKKKKKKGKG              ",
+    "           GggKggKKKgGGgKKKggKgg            ",
+    "         GgKgKgKKgKKKKKKKKgKKggKgGg         ",
+    "        gKKgKgKKKgKKKKKKKgKKgKgKKgKg        ",
+    "      GKgKKKKKKKKKKKKKKKgKKKKKgKgKKggG      ",
+    "      KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKg      ",
+    "     GKGKKLllllllllllllLlllLLlllLKKKKK      ",
+    "    GKKKKKllllllllllllllllllllllllKKKKg     ",
+    "    GKKKKKllllllllllllllllllllllllKKKKg     ",
+    "   lKKKKKKlllllllllllllllllllllllLKKKKKg    ",
+    "    KKKKKKllllllllllllllllllllllllKKKKKK    ",
+    "   KKKKKKKlllllllllllllllllllllllLKKKKKKK   ",
+    "  KKKKKKKKllllllllllWWWlllllllllllKKKKKKKK  ",
+    "  KKKKKKKKllllllllllWWWlllllllllllKKKKKKKK  ",
+    " KKKKKKKKKllllllllllWWWlllllllllllKKKKKKKKK ",
+    " KKgGGKKKKllllllllllllllllllllllllKKKKGGKKK ",
+    " KKKgKgGgKllllllllllllllllllllllllKgGggKgKK ",
+    "KKKKKgKgKKlllllllllllllllllllllllLKKgKKKKKKK",
+    "KKKKKKKKKKllllllllllllllllllllllllKKKKKKKKKK",
+    "KKKKKKKKKKllllllllllllllllllllllllKKKKKKKKKK",
+    " KKKKKKKKKllllllllllllllllllllllllKKKKKKKKK ",
+    "   KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK   ",
+    "      KKKKlllllllllllllllllllllllKKKKl      ",
+    "           lllllllllllllllllllllll          ",
+    "                                            ",
 ]
 
 SPRITES = {"kriton": (KRITON, KRITON_PAL), "olorin": (OLORIN, OLORIN_PAL)}
