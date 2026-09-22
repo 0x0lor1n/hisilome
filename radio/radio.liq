@@ -126,7 +126,7 @@ radio = normalize_track_gain(radio)
 radio = amplify(0.5, radio)
 
 radio = mksafe(radio)
-radio.on_metadata(synchronous=true, write_now_playing)
+# on_metadata is attached below write_schedule: the handler calls both.
 
 # Production supplies ICECAST_SOURCE_PASSWORD via systemd EnvironmentFile; the
 # default matches radio/icecast.xml for the loopback-only dev stack.
@@ -190,17 +190,15 @@ def write_console() =
       end
     # Step counts are literals: var() inside steps() does not reliably parse.
     esec = int_of_float(el)
-    tmin = int_of_float(du) / 60
     smod = esec mod 60
 
+    # Both digits are fixed 60-step animations; where in the track we are is a
+    # negative delay, same as the bar. Minutes tick once per 60s of wall time.
     elapsed_html =
       if du <= 0. then
         ''
-      elsif tmin < 1 then
-        # under a minute: no minute steps to animate, so the digit is static
-        '<span class="rc-m rc-static">0</span>:<span class="rc-s" style="animation: rc-sec 60s steps(60) -' ^ string(smod) ^ 's infinite"></span>'
       else
-        '<span class="rc-m" style="--tm:' ^ string(tmin) ^ ';animation: rc-min ' ^ string(tmin * 60) ^ 's steps(' ^ string(tmin) ^ ') -' ^ string(esec) ^ 's forwards"></span>' ^
+        '<span class="rc-m" style="animation: rc-min 3600s steps(60) -' ^ string(esec) ^ 's forwards"></span>' ^
         ':<span class="rc-s" style="animation: rc-sec 60s steps(60) -' ^ string(smod) ^ 's infinite"></span>'
       end
 
@@ -316,5 +314,17 @@ def write_schedule() =
     log.important(label="write_schedule", "write failed; will retry next tick")
   end
 end
+
+# Write the schedule in the same instant as the title, not up to 10 s later.
+# On a restart the first timer tick lands before any metadata (current_index is
+# still -1, so write_schedule skips), and the previous instance's file — built
+# from a queue that has since been reshuffled — stays on the page until the
+# second tick. listener_pos() still holds "now" on the previous track under
+# stream_latency, so both fragments agree with the console to the second.
+def on_track_change(m) =
+  write_now_playing(m)
+  write_schedule()
+end
+radio.on_metadata(synchronous=true, on_track_change)
 
 thread.run(every=10., write_schedule)

@@ -106,15 +106,17 @@ body {
 }
 
 /* Counters driven by animated <integer> properties; the animation
-   declarations come per-track from liquidsoap in the style attribute. */
+   declarations come per-track from liquidsoap in the style attribute.
+   Keyframes hold literals only: var() inside @keyframes is resolved
+   unreliably (Firefox rendered the minute digit stuck at 0), so minutes run
+   0..60 over an hour and the track's start is a negative delay, like the bar. */
 @property --m { syntax: "<integer>"; initial-value: 0; inherits: false; }
 @property --s { syntax: "<integer>"; initial-value: 0; inherits: false; }
 .rc-m { counter-reset: m var(--m); }
 .rc-m::after { content: counter(m); }
-.rc-m.rc-static::after { content: none; }
 .rc-s { counter-reset: s var(--s); }
 .rc-s::after { content: counter(s, decimal-leading-zero); }
-@keyframes rc-min { from { --m: 0; } to { --m: var(--tm); } }
+@keyframes rc-min { from { --m: 0; } to { --m: 60; } }
 @keyframes rc-sec { from { --s: 0; } to { --s: 60; } }
 @media (prefers-reduced-motion: reduce) {
   .rc-m, .rc-s { animation-play-state: paused; }
