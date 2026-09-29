@@ -131,14 +131,14 @@ KRITON. So where does the OS go?
 
 - OS resides on PCIe x1. A ~~btrfs~~ zfs mirror of two 256 GB NVMe drives is sitting on top of a PCIe x1 to dual NVMe splitter card (ASM1182e). ASM1182e is a PCIe 2.0 switch, so ~500 MB/s for both drives together, ~250 MB/s each under simultaneous load. More than enough for the OS.
 
-{{ d2(name="01-topology", alt="PCIe topology of the NAS. From the i5-6600T: the x16 slot (x8 used, ~7.9 GB/s) feeds an ASM2824 switch with 4 × x4 down to the fast-data NVMe mirror; DMI 3.0 x4 (~3.9 GB/s) feeds the B250 chipset. From the chipset: the M.2 slot links at PCIe 2.0 x4 (~2 GB/s) to the Intel 82599 SFP+ adapter; the x1 slot links at 2.0 (~500 MB/s) to an ASM1182e splitter, the single point of failure, holding the OS mirror; six SATA ports hold 3 × IronWolf raidz1, 2 × Barracuda stripe for the copy, one port free.") }}
-
 The picture came together:
 
 - 6 SATA ports: RAIDZ1 of 3 × IronWolf 6 TB (12 TB usable) + a separate pool of 2 × Barracuda 6 TB striped for the copy (12 TB, no redundancy). 1 SATA port free.
 - PCIe x16 slot: NVMe cluster with an onboard switch. 2 × 1 TB for fast data, 2 slots free.
 - PCIe x1 slot: ~~btrfs~~ ZFS mirror of 2 × 256 GB for the OS through a PCIe x1 to 2 × M.2 splitter card.
 - M.2 slot: NIC through an M.2-to-SFP+ adapter.
+
+{{ d2(name="01-topology", alt="PCIe topology of the NAS. From the i5-6600T: the x16 slot (x8 used, ~7.9 GB/s) feeds an ASM2824 switch with 4 × x4 down to the fast-data NVMe mirror; DMI 3.0 x4 (~3.9 GB/s) feeds the B250 chipset. From the chipset: the M.2 slot links at PCIe 2.0 x4 (~2 GB/s) to the Intel 82599 SFP+ adapter; the x1 slot links at 2.0 (~500 MB/s) to an ASM1182e splitter, the single point of failure, holding the OS mirror; six SATA ports hold 3 × IronWolf raidz1, 2 × Barracuda stripe for the copy, one port free.") }}
 
 ## Summary
 
