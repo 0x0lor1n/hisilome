@@ -730,9 +730,9 @@ footer {
   font-style: italic;
 }
 
-/* Outside the card, on the screen's bottom edge, one line: the tribute is a
-   signature, not a section. The card's bottom margin is its gap. The frame is
-   flex:1 with min-height:0, so this box never squeezes the article. */
+/* Outside the card, on the screen's bottom edge: two lines, no rule, the
+   card's bottom margin is its gap. The frame is flex:1 with min-height:0, so
+   this box never squeezes the article. */
 .shell-footer {
   flex: 0 0 auto;
   max-width: none;
@@ -742,13 +742,11 @@ footer {
 }
 
 .shell-footer .lain-tribute-text {
-  display: inline;
-  margin: 0;
+  margin-bottom: 0.15rem;
 }
 
 .shell-footer .lain-tribute-quote {
-  display: inline;
-  margin: 0 0 0 1em;
+  margin-bottom: 0;
 }
 
 /* the card */
