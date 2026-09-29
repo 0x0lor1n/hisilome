@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}Series - {{ config.title }}{% endblock title %}
+{% block description %}<meta name="description" content="Series: writeups and worklogs grouped by the thing they are about, in reading order.">{% endblock description %}
+
+{% block content %}
+<h1>Series</h1>
+<ul class="post-list">
+{% for s in section.pages %}
+<li>
+<h3><a class="post-title" href="{{ s.path | safe }}" data-name="{{ s.title }}">{{ s.title }}</a></h3>
+<p class="summary">{{ s.description }}</p>
+</li>
+{% endfor %}
+</ul>
+{% endblock content %}

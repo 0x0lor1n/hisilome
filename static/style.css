@@ -1411,3 +1411,50 @@ figure.pair.small img {
   width: 240px;
   max-width: 100%;
 }
+
+/* Content kind (writeup / worklog / series) in front of a title on mixed
+   lists and on log pages. Muted, no chip: a label, not a button. */
+.kind {
+  color: var(--meta);
+  font-weight: 400;
+  font-size: 0.75em;
+  letter-spacing: 0.04em;
+}
+
+.kind::before { content: "["; }
+.kind::after { content: "]"; }
+
+/* "$ series: <name> #2  ← #1  #3 →" under the permalink line. */
+.series-strip {
+  color: var(--meta);
+  font-size: 0.85rem;
+  margin-top: -0.6rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: baseline;
+}
+
+.series-strip .part {
+  color: var(--carp-yellow);
+}
+
+.series-strip a {
+  color: var(--link);
+}
+
+.series-strip .off {
+  opacity: 0.35;
+}
+
+.lead {
+  color: var(--meta);
+}
+
+@media (max-width: 640px) {
+  /* Four links now; ./series is the one the list survives without. */
+  .topbar nav a[href="/series/"] {
+    display: none;
+  }
+}

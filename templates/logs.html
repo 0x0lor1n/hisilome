@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}Logs - {{ config.title }}{% endblock title %}
+{% block description %}<meta name="description" content="Worklogs: parts lists, measurements, command dumps. The raw material between writeups.">{% endblock description %}
+
+{% block content %}
+<h1>Logs</h1>
+<p class="lead">Worklogs: parts lists, numbers, command dumps. What a writeup is later distilled from. <a href="/logs/rss.xml">rss</a></p>
+<ul class="post-list">
+{% for page in section.pages %}
+{{ macros::post_item(page=page) }}
+{% endfor %}
+</ul>
+{% endblock content %}

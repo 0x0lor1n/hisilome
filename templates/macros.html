@@ -6,6 +6,59 @@
 </div>
 {% endmacro post_meta %}
 
+{#- One entry of a post list. kind is shown as a prefix on mixed lists (series
+    pages) where a writeup and a worklog sit next to each other. -#}
+{% macro post_item(page, kind=false, summary=true) %}
+<li>
+<h3>{% if kind %}<span class="kind">{% if page.components.0 == "logs" %}worklog{% else %}writeup{% endif %}</span> {% endif %}<a class="post-title" href="{{ page.path | safe }}" data-name="{{ page.title }}">{{ page.title }}</a></h3>
+{{ self::post_meta(page=page) }}
+{% if summary and page.description %}<p class="summary">{{ page.description }}</p>{% endif %}
+</li>
+{% endmacro post_item %}
+
+{#- Every page in the site that declares extra.series = slug, from the two
+    sections that can hold them, sorted by extra.part. Rendered as a list
+    (mode="list") or as the prev/next strip under an article (mode="nav",
+    needs current). Tera macros cannot return arrays, so both live here. -#}
+{% macro series_pages(slug, mode, current="") %}
+{%- set writeups = get_section(path="_index.md") %}
+{%- set logs = get_section(path="logs/_index.md") %}
+{%- set_global parts = [] %}
+{%- for p in writeups.pages | concat(with=logs.pages) %}
+  {%- if p.extra.series is defined and p.extra.series == slug %}
+    {%- set_global parts = parts | concat(with=[p]) %}
+  {%- endif %}
+{%- endfor %}
+{%- set parts = parts | sort(attribute="extra.part") %}
+{%- if mode == "list" %}
+<ul class="post-list">
+{%- for p in parts %}
+{{ self::post_item(page=p, kind=true) }}
+{%- endfor %}
+</ul>
+{%- else %}
+{%- set total = parts | length %}
+{%- set_global prev = "" %}{%- set_global next = "" %}
+{%- for p in parts %}
+  {%- if p.path == current %}
+    {%- if not loop.first %}{%- set_global prev = parts | nth(n=loop.index0 - 1) %}{%- endif %}
+    {%- if not loop.last %}{%- set_global next = parts | nth(n=loop.index0 + 1) %}{%- endif %}
+  {%- endif %}
+{%- endfor %}
+{%- if prev %}<a href="{{ prev.path | safe }}" title="{{ prev.title }}">&larr; #{{ prev.extra.part }}</a>{% else %}<span class="off">&larr;</span>{% endif %}
+{%- if next %}<a href="{{ next.path | safe }}" title="{{ next.title }}">#{{ next.extra.part }} &rarr;</a>{% else %}<span class="off">&rarr;</span>{% endif %}
+{%- endif %}
+{% endmacro series_pages %}
+
+{#- "Part N of M in <series>" strip under an article title. Silent when the
+    page has no series. -#}
+{% macro series_strip(page) %}
+{%- if page.extra.series is defined %}
+{%- set s = get_page(path="series/" ~ page.extra.series ~ ".md") %}
+<p class="series-strip"><span class="cmd">$ series:</span> <a href="{{ s.path | safe }}">{{ s.title }}</a> <span class="part">#{{ page.extra.part }}</span> {{ self::series_pages(slug=page.extra.series, mode="nav", current=page.path) }}</p>
+{%- endif %}
+{% endmacro series_strip %}
+
 {#- ext=true renders links for the radio shell's OUTER document, where a plain
     navigation would replace the shell and stop the stream. -#}
 {% macro shell_topbar(ext=false) %}
@@ -14,6 +67,10 @@
 <span class="cmd" aria-hidden="true">$ cd</span>
 <nav aria-label="Main">
 <a href="/"{% if ext %} target="content"{% endif %}>./archive</a>
+<span class="cmd" aria-hidden="true">&& cd</span>
+<a href="/logs/"{% if ext %} target="content"{% endif %}>./logs</a>
+<span class="cmd" aria-hidden="true">&& cd</span>
+<a href="/series/"{% if ext %} target="content"{% endif %}>./series</a>
 <span class="cmd" aria-hidden="true">&& cd</span>
 <a href="/tags/"{% if ext %} target="content"{% endif %}>./tags</a>
 </nav>
