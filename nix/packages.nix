@@ -56,7 +56,7 @@ pkgs: let
       # <?xml?> prolog is not a prolog but a bogus comment.
       find content -name '[0-9]*.d2' -print0 | while IFS= read -r -d "" f; do
         layout=$(sed -n '1,3s/^# layout: *//p' "$f" | head -1)
-        d2 --layout "''${layout:-elk}" --theme 200 --pad 20 --scale 1 --no-xml-tag "$f" "''${f%.d2}.svg"
+        d2 --layout "''${layout:-elk}" --theme 200 --pad 10 --scale 1 --no-xml-tag "$f" "''${f%.d2}.svg"
         # d2 paints its shape palette onto <image> too, where SVG defines
         # neither attribute. They render nothing (verified: stripping them is
         # pixel-identical) but are invalid inline, so drop them on the
