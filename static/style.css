@@ -701,21 +701,6 @@ footer {
   background: var(--bg);
 }
 
-/* compact: in a fixed-height shell every px here costs the content frame */
-.shell-footer {
-  flex: 0 0 auto;
-  margin: 0;
-  padding: 0.5rem 1.25rem 0.6rem;
-}
-
-.shell-footer .lain-tribute-text {
-  margin-bottom: 0.15rem;
-}
-
-.shell-footer .lain-tribute-quote {
-  margin-bottom: 0;
-}
-
 .lain-tribute {
   max-width: 980px;
   margin: 3rem auto 0;
@@ -745,7 +730,26 @@ footer {
   font-style: italic;
 }
 
+/* Outside the card, on the screen's bottom edge, one line: the tribute is a
+   signature, not a section. The card's bottom margin is its gap. The frame is
+   flex:1 with min-height:0, so this box never squeezes the article. */
+.shell-footer {
+  flex: 0 0 auto;
+  max-width: none;
+  margin: 0;
+  padding: 0 1.25rem 0.5rem;
+  border-top: 0;
+}
 
+.shell-footer .lain-tribute-text {
+  display: inline;
+  margin: 0;
+}
+
+.shell-footer .lain-tribute-quote {
+  display: inline;
+  margin: 0 0 0 1em;
+}
 
 /* the card */
 
@@ -771,7 +775,10 @@ footer {
   flex-direction: column;
   /* required: align-items:center on the parent would shrink-to-fit this box */
   width: 100%;
-  margin: 1.25rem 0;
+  /* Tighter than the plain card: in a 100vh shell the vertical margin and
+     padding come straight out of the article. Sides keep the card's 1.5rem. */
+  margin: 0.75rem 0 0.5rem;
+  padding: 1rem 1.5rem;
   overflow: hidden;
 }
 

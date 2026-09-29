@@ -9,11 +9,9 @@ pch: B250 chipset (PCH) {class: box}
 asm2824: ASM2824 switch\nPCIe 3.0, x8 up, 4 × x4 down {class: ours}
 nvme: 2 × 1 TB NVMe\nZFS mirror, fast data\n+ 2 slots free {class: box}
 
-sfp: M.2 → SFP+ adapter\nIntel 82599, PCIe 2.0 x4 {class: ours}
-net: SFP+ cage\n10 Gbit needs ~1.25 GB/s {class: box}
+sfp: M.2 → SFP+ adapter\nIntel 82599, PCIe 2.0 x4\n10 Gbit needs ~1.25 GB/s {class: ours}
 
-asm1182e: ASM1182e switch\nPCIe 2.0 x1 → 2 × M.2 {class: spof}
-os: 2 × 256 GB NVMe\nZFS mirror, OS {class: box}
+asm1182e: ASM1182e switch\nPCIe 2.0 x1 → 2 × M.2\n2 × 256 GB NVMe, ZFS mirror, OS {class: spof}
 
 sata: 6 × SATA 6 Gb/s {
   class: grp
@@ -25,15 +23,13 @@ sata: 6 × SATA 6 Gb/s {
   free: 1 port free {class: drawer}
 }
 
-cpu -> asm2824: "x16 slot, x8 used\n~7.9 GB/s" {style.stroke: "#98bb6c"}
+cpu -> asm2824: "x16 slot, x8 used, ~7.9 GB/s" {style.stroke: "#98bb6c"}
 asm2824 -> nvme: "4 × PCIe 3.0 x4" {style.stroke: "#98bb6c"}
 
-cpu -> pch: "DMI 3.0 x4, ~3.9 GB/s\nshared by all below" {style.stroke: "#727169"}
+cpu -> pch: "DMI 3.0 x4, ~3.9 GB/s, shared by all below" {style.stroke: "#727169"}
 
-pch -> sfp: "M.2 slot, links at 2.0 x4\n~2 GB/s" {style.stroke: "#98bb6c"}
-sfp -> net: "10 Gbit" {style.stroke: "#98bb6c"}
+pch -> sfp: "M.2 slot, links at 2.0 x4, ~2 GB/s" {style.stroke: "#98bb6c"}
 
-pch -> asm1182e: "x1 slot, links at 2.0\n~500 MB/s" {style.stroke: "#d27e99"}
-asm1182e -> os: "~250 MB/s each\nunder load" {style.stroke: "#d27e99"}
+pch -> asm1182e: "x1 slot, links at 2.0, ~500 MB/s" {style.stroke: "#d27e99"}
 
 pch -> sata: "" {style.stroke: "#727169"}
