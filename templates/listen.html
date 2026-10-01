@@ -16,14 +16,16 @@
 {% endblock head_meta -%}
 
 {#- The shell: topbar and console live here and only the middle frame
-    navigates, so a link never destroys the <audio> element. -#}
+    navigates, so a link never destroys the <audio> element. The tribute sits
+    under the card on the screen's bottom edge: inside it cost the article
+    ~140px on a 1080p display. -#}
 {% block body %}
 <body class="shell-body">
 <div class="frame">
 {{ m::shell_topbar(ext=true) }}
 {{ m::shell_console(ext=true) }}
 <iframe class="shell-content" src="<!--# echo var="request_uri" -->" name="content" title="{{ config.title }}"></iframe>
-{{ m::shell_footer(ext=true) }}
 </div>
+{{ m::shell_footer(ext=true) }}
 </body>
 {% endblock body %}

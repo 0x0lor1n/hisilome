@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ page.title }} - {{ config.title }}{% endblock title %}
+{% block description %}<meta name="description" content="{{ page.description }}">{% endblock description %}
+
+{% block content %}
+<h1><span class="kind">series</span> {{ page.title }}</h1>
+{{ page.content | safe }}
+{{ macros::series_pages(slug=page.slug, mode="list") }}
+<p><a href="/series/">&larr; all series</a></p>
+{% endblock content %}

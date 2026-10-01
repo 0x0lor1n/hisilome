@@ -8,11 +8,7 @@
    this - decided to ignore, see git log. Fix CLI vnu errors, not this. #}
 <ul class="post-list">
 {% for page in section.pages %}
-<li>
-<h3><a class="post-title" href="{{ page.path | safe }}" data-name="{{ page.title }}">{{ page.title }}</a></h3>
-{{ macros::post_meta(page=page) }}
-<p class="summary">{{ page.description }}</p>
-</li>
+{{ macros::post_item(page=page) }}
 {% endfor %}
 </ul>
 {% endblock content %}
