@@ -1,5 +1,5 @@
 +++
-title = "Building a NAS #2: Hardware list"
+title = "Custom NAS #2: Hardware list"
 date = 2026-09-29
 description = "Every part of the NAS with the price and where it came from, the pool layout, what is left free on the board, and how long a resilver takes on 6 TB drives."
 
@@ -7,7 +7,7 @@ description = "Every part of the NAS with the price and where it came from, the 
 tags = ["nas", "zfs", "hardware", "homelab", "worklog"]
 
 [extra]
-series = "building-a-nas"
+series = "nas-zfs"
 part = 2
 +++
 ## The build
@@ -81,7 +81,7 @@ Procedures:
 - **2x M.2** on the ASM2824: `fast` grows when it fills up.
 - **1x PCIe x1**: ASM1166 (6x SATA, supports port multipliers) + an eSATA bracket → an external box for the warm backup (18 TB + 2x 6 TB SMR, own power). Box off → cold; box on and `zpool import` → warm.
 
-## Appendix: rebuild time after a drive swap
+## Appendix A: rebuild time after a drive swap
 
 Ranges from Synology and TrueNAS forum reports plus arithmetic on average HDD throughput (~140 MB/s for 6 TB CMR). Conditions: idle array, CMR drives, raidz1 ~70 % full.
 
@@ -108,3 +108,63 @@ Sources:
 - https://forums.truenas.com/t/long-resilver-time-tl-dr/29218
 - https://www.truenas.com/community/threads/drive-size-and-resilvering-times.95917
 - https://louwrentius.com/zfs-resilver-performance-of-various-raid-schemas.html
+
+## Appendix B: power draw and running cost
+
+Estimate from component datasheets. Wall figures assume ~87 % PSU efficiency at 10–20 % load (80+ Gold). Measured figures with a wall meter: separate worklog after the build.
+
+| Component | Idle | Load |
+|---|---|---|
+| i5-6600T + B250M + 2x DDR4 | 14 W | 45 W |
+| 3x IronWolf 6 TB (`tank`, spinning / standby) | 12 W / 2.5 W | 16 W |
+| 2x Barracuda 6 TB (`backup`, standby, pool exported) | 0.5 W | 11 W (during `zfs recv`) |
+| 4x NVMe | 2.5 W | 8 W |
+| ASM2824 switch | 5 W | 6 W |
+| ASM1182e adapter | 1.5 W | 1.5 W |
+| X520-DA1 + DAC | 6 W | 6 W |
+| Fans (200 + 120 + CPU) | 3 W | 4 W |
+| **DC total** | **~45 W** (`tank` standby: ~36 W) | **~98 W** |
+| **At the wall** | **~52 W** (`tank` standby: ~41 W) | **~113 W** |
+
+Load = scrub or nightly `zfs send`; runs a few hours a day at most. `tank` spins down after inactivity (planned, timeout to be tuned against spin-up count in SMART).
+
+SIG tariff 2026, Profil Simple, Électricité Vitale Vert 10 % (reference product), VAT included:
+
+| Item | ct/kWh |
+|---|---|
+| Energy | 11.24 |
+| Grid use | 11.35 |
+| Cantonal levy (13.2 % of grid use) | 1.50 |
+| Federal renewable surcharge | 2.49 |
+| Federal electricity reserve | 0.44 |
+| Solidarity costs | 0.05 |
+| **Total** | **27.1** |
+
+Meter fee (CHF 7.24/month) is fixed per household and not attributed to the NAS. Vitale Vert 100 % would be 30.9 ct/kWh.
+
+| Scenario | Average draw | kWh/year | CHF/year | CHF/month |
+|---|---|---|---|---|
+| Idle 24/7, `tank` spinning | 52 W | 456 | 124 | 10.3 |
+| Idle 24/7, `tank` standby | 41 W | 359 | 97 | 8.1 |
+| 14 h standby + 8 h spinning + 2 h load | 51 W | 447 | 121 | 10.1 |
+| Load 24/7 (upper bound) | 113 W | 990 | 268 | 22.4 |
+
+Largest single consumers at idle with `tank` in standby: X520 (6 W, ~15 %), ASM2824 (5 W), CPU + board (14 W). Spin-down of `tank` is worth ~11 W at the wall / CHF 24–27 per year.
+
+Reference: DS923+ with 4 drives, ~40 W active / ~17 W with HDD hibernation → ~250–350 kWh/year → CHF 68–95 at the same tariff.
+
+Source: https://media.sig-ge.ch/documents/tarifs_reglements/electricite/tarifs/tarifs_electricite_tous_clients.pdf
+
+## Appendix C: deferred to the next build
+
+Decided, not implemented here. Each one either needs different hardware or does not pay off at this size.
+
+| Feature | What it solves | Why not now | What it takes |
+|---|---|---|---|
+| ECC RAM | Bit flips in RAM before ZFS checksums the block; ZFS cannot detect these | B250M / i5-6600T do not support ECC | W680 or C246 board + Xeon E / i3 with ECC, or AM4/AM5 board with ECC UDIMM validated (ASRock Rack); ECC UDIMM |
+| ZFS `special` vdev on its own NVMe mirror | Metadata and small blocks on SSD: directory listings, `find`, rsync scans, small-file datasets stop touching HDD | Media-heavy pool at 30 TB, ARC 32 GB covers hot metadata; losing `special` loses the pool, so it must be a mirror, and both spare M.2 slots on the ASM2824 are reserved for growing `fast` | 2x NVMe (~1 % of pool size, 256–512 GB) on a dedicated mirror; `special_small_blocks` per dataset |
+| Hot plugging | Swap a failed drive without powering down; no resilver interruption from a reboot | Divider 200 has fixed cages, no backplane; drives are cabled directly | Case with hot-swap bays and SATA backplane (or a 5-in-3 cage), AHCI hot-plug enabled in BIOS, `zpool replace` by `/dev/disk/by-id` |
+| Cold backup of `tank` | Full offline copy in another building: fire, theft, ransomware, operator error | Partial cold only: KeePass DBs + 2FA export on Kingston IronKey, photo archive on an external HDD | 2x 18 TB or a second NAS at another site; rotate monthly; `zfs send` to it, then export and unplug |
+| UPS | Clean shutdown on power loss; no interrupted resilver or scrub; HDD heads park under power, not on a crash | ZFS itself survives a power cut (transactional, copy-on-write); the remaining risk is mechanical and a mid-resilver cut on raidz1 | 600–900 VA line-interactive (APC Back-UPS, Eaton Ellipse), USB, NUT on NixOS with `services.ups`; ~CHF 150–250 |
+| L2ARC | Second-level read cache on NVMe when the working set does not fit in ARC | ARC 32 GB is not saturated by a media workload; L2ARC only helps once ARC hit rate drops; L2ARC headers consume ARC | One NVMe (no mirror needed, loss is harmless), `zpool add tank cache`, persistent since ZFS 2.0; add after seeing `arcstat` hit rate < 90 % |
+

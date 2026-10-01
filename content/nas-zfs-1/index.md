@@ -1,15 +1,19 @@
 +++
-title = "Building a NAS #1: Recon and Decision Making"
+title = "Custom NAS #1: Recon and Decision Making"
 date = 2026-09-29
-description = "Why not Synology, why ZFS, what goes on which disks, and how an old MSI B250M board ends up with 10 Gbit, an NVMe cluster and a mirrored OS on a PCIe x1 slot."
+description = "Recon for a home NAS on ZFS and NixOS: why not Synology, what goes on which disks, and how an old MSI B250M board ends up with 10 Gbit, an NVMe cluster and a mirrored OS on a PCIe x1 slot."
 
 [taxonomies]
 tags = ["nas", "zfs", "nixos", "hardware", "homelab"]
 
 [extra]
-series = "building-a-nas"
+series = "nas-zfs"
 part = 1
 +++
+- **Built:** MSI b250m PRO-VD + i5-6600T, NixOS, 10 Gbit SFP+, ZFS: hot data (1TB NVMe mirror, 12TB RAIDZ1), warm data (12TB).
+- **Budget:** ~CHF 1300 with all drives.
+## Lyrical hook
+
 For past ~20 years I have collected data of different type. Not so much though (~4 TB). Four years ago I started doing outdoor activities and got a GoPro. The thing is very video hungry and I am dumping it too slow.
 
 My storage was growing up too: USB sticks, external drives, HDDs, SSDs, sometimes even a very old computer. So I have bought this 6 TB Porsche Design drive. That was a newbie mistake: two years later it stopped responding and system (Linux) was not detecting it anymore and it was a nightmare to fix.
@@ -48,7 +52,7 @@ For the sake of the reseatch I checked what Synology offers for my build budget 
 
 The first topic in this agenda was the classic mdadm setup for RAID arrays. Quick PoC (two days of work) and I had RAID 10 on btrfs in QEMU virtual machine running. Forums + investigation led to discovery of ZFS (I have heard about it couple times in the basements of system administrators). Ran similar test with RAIDZ1 and knew: this is it.
 
-First thing: ZFS solves power loss during a write - it just rolls back on restart to the state after last completed copy-on-write operation. Transaction in flight at the moment of shutdown is lost, obviously. Benchmarks in QEMU: only last 1–5 seconds before shutdown are gone.
+First thing: ZFS solves power loss during a write - it just rolls back on restart to the state after last completed copy-on-write operation. Transaction in flight at the moment of shutdown is lost, obviously (basic UPS required for a clean shutdown). Benchmarks in QEMU: only last 1–5 seconds before shutdown are gone.
 
 It also corrects bit-flips by default. With a notice: only if we have redundancy (mirror/RAIDZ) + regular scrub. No recovery out of thin air, no defragmentation - only deltas in snapshots. Elegant.
 
@@ -93,7 +97,7 @@ NVMe SSD only for quick read of data. No RAID: it's basically a cache and can be
 
 ## No place is like 127.0.0.1
 
-NVMe SSD for the Operating System. NixOS wants to write a lot to /nix/store. A btrfs mirror requires at least two NVMe drives. In the closet I found one 256 GB NVMe drive and one 256 GB M.2 2232 with an M.2 adapter -> that's what's up.
+NVMe SSD for the Operating System. NixOS wants to write a lot to /nix/store. A ~~btrfs~~ zfs mirror requires at least two NVMe drives. In the closet I found one 256 GB NVMe drive and one 256 GB M.2 2232 with an M.2 adapter -> that's what's up.
 
 Result: at least 5 SATA ports and 6 or more NVMe slots. Already at this point it was clear I will hardly find a board with 6+ NVMe slots. That was going to be the interesting part.
 
@@ -157,4 +161,4 @@ What I accept knowingly:
 - Backup pool is not a 3-2-1 backup. Same case, same PSU. Protects from drive death and my own mistakes (snapshots), not from fire or a 12 V spike. Real cold backup on a shelf is a separate story.
 - RAIDZ1 does not turn into RAIDZ2. Expansion adds a disk, the parity level remains forever. Above I said it's better to plan raidz2 from the start, and I changed my mind: three CMR drives in raidz1 + a full copy on a separate pool. For data survival that's raidz2: two drives can die. For uptime it's not: raidz2 keeps serving even with two dead drives, here a second death in the main pool means restoring from the copy. In exchange the copy protects from my own screw-ups. If I want RAIDZ2 - just recreate the pool through the copy.
 
-Next part - work log: list of all components, purchase prices and where they came from.
+Next part - work log: list of all components, purchase prices, usage predictions, upgrade plans.
