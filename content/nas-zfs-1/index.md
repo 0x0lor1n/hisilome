@@ -10,15 +10,15 @@ tags = ["nas", "zfs", "nixos", "hardware", "homelab"]
 series = "nas-zfs"
 part = 1
 +++
-- **Built:** MSI b250m PRO-VD + i5-6600T, NixOS, 10 Gbit SFP+, ZFS: hot data (1TB NVMe mirror, 12TB RAIDZ1), warm data (12TB).
+- **Built:** [MSI b250m PRO-VD](https://www.msi.com/Motherboard/B250M-PRO-VD/Specification) + [i5-6600T](https://www.intel.com/content/www/us/en/products/sku/88189/intel-core-i56600t-processor-6m-cache-up-to-3-50-ghz/specifications.html), NixOS, 10 Gbit SFP+, ZFS: hot data (1TB NVMe mirror, 12TB RAIDZ1), warm data (12TB).
 - **Budget:** ~CHF 1300 with all drives.
 ## Lyrical hook
 
 For past ~20 years I have collected data of different type. Not so much though (~4 TB). Four years ago I started doing outdoor activities and got a GoPro. The thing is very video hungry and I am dumping it too slow.
 
-My storage was growing up too: USB sticks, external drives, HDDs, SSDs, sometimes even a very old computer. So I have bought this 6 TB Porsche Design drive. That was a newbie mistake: two years later it stopped responding and system (Linux) was not detecting it anymore and it was a nightmare to fix.
+My storage was growing up too: USB sticks, external drives, HDDs, SSDs, sometimes even a very old computer. So I have bought this [6 TB Porsche Design drive](https://www.seagate.com/it/it/support/creative-pro/lacie-porsche-design-desktop-drive/). That was a newbie mistake: two years later it stopped responding and system (Linux) was not detecting it anymore and it was a nightmare to fix.
 
-Disclaimer: why I don't use cloud storage: clouds lost my trust long time ago. Personal experience: Meta (whatsapp + facebook) was posting pictures from *my* archives to their platforms without my approval. This is against my rules what goes online. Another example: some friends had an issue with Apple's cloud - pictures they deleted were showing up in albums after 5 years.
+Disclaimer: why I don't use cloud storage: clouds lost my trust long time ago. Personal experience: Meta (whatsapp + facebook) was posting pictures from *my* archives to their platforms without my approval. Another example: some friends had an issue with Apple's cloud - pictures they deleted were showing up in albums after 5+ years.
 
 {% dialogue() %}
 KRITON. So the cloud posted your photos.
@@ -34,7 +34,7 @@ KRITON. You called the last one a newbie mistake.
 0x0lor1n. I opened that one too.
 {% end %}
 
-When it stopped being recognized I tried to open the case, calmly. Took me like an hour and a half, bent two steel pry bars and cut a finger. Then I looked in the web for a guy who by Murphy's law solved this problem. Found one, a guy who filmed the process of opening similar Porsche Design case. Turns out: there is a latch invisible from outside you need to slide out.
+When it stopped being recognized I tried to open the case, calmly. Took me like an hour and a half, bent two steel pry bars and cut a finger. Then I looked in the web for a guy who by concept of [simultaneous discovery](https://en.wikipedia.org/wiki/Multiple_discovery) solved this problem. Found one, a guy who filmed the process of opening similar Porsche Design case. Turns out: there is a latch invisible from outside you need to slide out.
 
 So after that I made diagnostics of the hard drive and happily got as result: only the control board is dead, the information on it safe. Ordered a new shell/controller assembly set from AliExpress - problem solved.
 
@@ -42,11 +42,12 @@ Since that moment I wanted a better solution. A year ago I became tired of my ot
 
 ## Recon
 
-Any project starts with "1. Recon" in notebook. I started the old school way: looking for engineers that I know at work/telegram/past, trying to find videos on youtube, reading top-N lists in search results. Most of the people were using Synology; in top-N lists there was only one alternative - QNAP; on YouTube I found couple TrueNAS reviews and tons of enterprise solutions review videos on Supermicro motherboards.
+Any project starts with "1. Recon" in notebook. I started the old school way: looking for engineers that I know at work/telegram/www. Most of the people were using [Synology](https://en.wikipedia.org/wiki/Synology); in top-tier lists there was only one alternative - [QNAP](https://en.wikipedia.org/wiki/QNAP); also, on forums I discovered [TrueNAS](https://github.com/truenas) and an enterprise scale hardware setups based on [Supermicro](https://www.reddit.com/r/supermicro/) motherboards.
 
-I was checking Synology first and quickly realized it was not my cup of tea for two reasons: closed source software; main feature: proprietary type of RAID (read about it, could not find anything different from regular RAID 5). QNAP - same story. If I self host, I can just spend couple evenings setting up software myself and with that logic I started to read how TrueNAS is constructed and what enterprise offers.
+Synology quickly became not my cup of tea for two reasons: proprietary software [DiskStation Manager](https://www.synology.com/it-it/dsm); proprietary RAID array ([Synology Hybrid Raid](https://kb.synology.com/DSM/tutorial/What_is_Synology_Hybrid_RAID_SHR) = [mdadm](https://github.com/md-raid-utilities/mdadm/) + [LVM](https://en.wikipedia.org/wiki/Logical_volume_management)). Two cool things it offered from my point of view - [ECC memory](https://en.wikipedia.org/wiki/ECC_memory) support out of the box and possibility to add drives of different size via SHR. 2 pennies for the DSM: two pals set up their [DS923+](https://www.synology.com/it-it/store/Refurbished%20DS923%2B) in one evening and never thought about it again.
+QNAP - same story. 
 
-For the sake of the reseatch I checked what Synology offers for my build budget (~1300CHF). The nearest in terms of drive bays is DS1525+. At that price you get one item out of three: 10 Gbit, or more drives, or NVMe. And they allow to use *only* their own NVMe drives in a pool at the price of 350CHF per 800 GB. Everything together (SFP+, an NVMe pool and a second pool for backup) is twice as expensive. The only advantage Synology has at the same price - ECC memory. I don't count DSM out of the box as advantage (two pals set up their DS923+ in one evening and never thought about it again).
+Vendor limitations can be removed by spending couple evenings setting up software layer yourself and like that get 100% freedom of choice on software and hardware selection/upgrades. With that concept in mind I started to read how TrueNAS is constructed and what enterprise offers.
 
 ## File system
 
@@ -54,9 +55,9 @@ The first topic in this agenda was the classic mdadm setup for RAID arrays. Quic
 
 First thing: ZFS solves power loss during a write - it just rolls back on restart to the state after last completed copy-on-write operation. Transaction in flight at the moment of shutdown is lost, obviously (basic UPS required for a clean shutdown). Benchmarks in QEMU: only last 1–5 seconds before shutdown are gone.
 
-It also corrects bit-flips by default. With a notice: only if we have redundancy (mirror/RAIDZ) + regular scrub. No recovery out of thin air, no defragmentation - only deltas in snapshots. Elegant.
+It also corrects [bit-flips](https://en.wikipedia.org/wiki/RAM_parity#Memory_errors) by default. With a notice: only if we have redundancy (mirror/RAIDZ). No recovery out of thin air, no defragmentation - only deltas in snapshots. Simple and efficient.
 
-Since OpenZFS v2.3 there is RAIDZ expansion on a live RAIDZ: you can add a disk to RAIDZ without rebuilding it. Old data remains in the old parity layout and usable space increases by less than the full disk until the data gets re-written. After that - no reasons not to use ZFS remain. In reality RAIDZ1 ~ RAID 5, RAIDZ2 ~ RAID 6, but with a checksum on every block, self healing, no write hole.
+Since [OpenZFS](https://github.com/openzfs/zfs) v2.3 there is RAIDZ expansion on a live array: you can add a disk to an array without rebuilding it. Old data remains in the old parity layout and usable space increases by less than the full disk until the data gets re-written. After that - no reasons not to use ZFS remain. In reality RAIDZ1 ~ RAID 5, RAIDZ2 ~ RAID 6, but with a checksum on every block, self healing, no write hole.
 
 ## Operating system
 
@@ -68,8 +69,8 @@ Before picking drives I need to understand what data goes to the NAS.
 
 ZFS:
 
-- Everything that is PII: megabytes. Encrypted ZFS dataset. Slow reads are fine.
-- Music, old projects, torrent downloads, backups, GoPro video, photos: terabytes. Unencrypted dataset. Slow reads.
+- Everything that is [PII](https://en.wikipedia.org/wiki/Personal_data), [Keepass](https://keepass.info/) database, [MFA Codes](https://github.com/stratumauth/app) backup: megabytes. Encrypted ZFS dataset. Slow reads are fine.
+- Music, old projects, torrent downloads, backups, GoPro video, photos, video games: terabytes. Unencrypted dataset. Slow reads.
 - Nix cache for builds (I am a Nix user): gigabytes. Unencrypted dataset. Fast reads.
 - Databases, Docker containers, virtual machines: gigabytes. Unencrypted dataset. Fast reads.
 
@@ -89,7 +90,7 @@ I also need place for a warm copy, so one SATA port - drive with many TB. Six SA
 
 On five SATA ports: 4 × 6 TB SATA HDD in RAIDZ2 + 1 × 12 TB SATA HDD for the backup. On four: 3 × 6 TB in RAIDZ1 + 1 × 12 TB.
 
-*Update from the build.* Well, two of my Barracudas were SMR. Rebuild on shingled drives is a matter of days instead of hours, so no raidz for them. New drives - CMR only: IronWolf, Exos, WD Red Plus. Barracudas became the backup pool: three IronWolf in raidz1, two Barracuda as a plain stripe with zfs send on cron and spin-down when idle. Stripe means no redundancy: one dead Barracuda and the copy is gone. Fine for a copy - the main pool does not even notice it, zfs send rebuilds it overnight. One SATA port left.
+*Update from the build.* Well, two of my [Barracudas](https://en.wikipedia.org/wiki/Seagate_Barracuda) were of [SMR](https://en.wikipedia.org/wiki/Shingled_magnetic_recording) type. Rebuild on shingled drives is a matter of days instead of hours, so no RAID array for them. New drives - [CMR](https://en.wikipedia.org/wiki/Conventional_magnetic_recording) only: [IronWolf](https://www.seagate.com/gb/en/products/nas-drives/ironwolf-hard-drive/), [Exos](https://www.seagate.com/gb/en/products/data-storage-systems/), [WD Red Plus](https://documents.westerndigital.com/content/dam/doc-library/en_us/assets/public/western-digital/product/internal-drives/wd-red-plus-hdd/product-brief-western-digital-wd-red-plus-hdd.pdf). Barracudas became the backup pool: three IronWolf in RAIDZ1, two Barracuda as a plain stripe with zfs send on cron and spin-down when idle. Stripe means no redundancy: one dead Barracuda and the copy is gone. Fine for a copy - the main pool does not even notice it, zfs send rebuilds it overnight. One SATA port left.
 
 ## Fast data
 
@@ -97,7 +98,7 @@ NVMe SSD only for quick read of data. No RAID: it's basically a cache and can be
 
 ## No place is like 127.0.0.1
 
-NVMe SSD for the Operating System. NixOS wants to write a lot to /nix/store. A ~~btrfs~~ zfs mirror requires at least two NVMe drives. In the closet I found one 256 GB NVMe drive and one 256 GB M.2 2232 with an M.2 adapter -> that's what's up.
+NVMe SSD for the Operating System. NixOS wants to write a lot to [/nix/store](https://nix.dev/manual/nix/2.24/store/types/). A ~~btrfs~~ zfs mirror requires at least two NVMe drives. In the closet I found one 256 GB NVMe drive and one 256 GB M.2 2232 with an M.2 adapter -> that's what's up.
 
 Result: at least 5 SATA ports and 6 or more NVMe slots. Already at this point it was clear I will hardly find a board with 6+ NVMe slots. That was going to be the interesting part.
 
@@ -106,13 +107,13 @@ Result: at least 5 SATA ports and 6 or more NVMe slots. Already at this point it
 - Low power consumption.
 - 10Gbit/s network. Reasoning: My home network supports 10GBit/s over SFP+ and RJ45. Actively used Nix cache needs at least 2.5 Gbit link, so if possible - design for 10Gbit/s.
 - Well-ventilated case to keep the microclimate healthy.
-- No TPM. PII will be encrypted, and in all my projects I use age + TPM encryption from the host for PII and sensitive data. Nothing to encrypt on this machine. That opens the market of old motherboards = noice.
+- No [TPM](https://it.wikipedia.org/wiki/Trusted_Platform_Module) needed. PII will be encrypted with [AT88CK590](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8945-CryptoAuth-USB-Dongle-Demo-Eval-Kits-Hardware-UserGuide.pdf) and Keepass stored password as fallback, and in all my projects I use age + TPM encryption from the host for PII and sensitive data. Nothing to encrypt on this machine. That opens the market of old motherboards = noice.
 
-With picture somewhat clear it was time to go deep into home lab corners of internet. The most interesting discussions I found were on 4pda.ru in the NAS configurations thread. After week of comparing motherboard/cpu combos I decided to pick MSI B250M PRO-VD with Intel Core i5-6600T. I have talked to the author of that build on the forum and got an idea how this combo performs in reality. Better than any documentation. Learned couple tricks for stock bios and went for my first NAS build.
+With picture somewhat clear it was time to go deep into home lab corners of internet. A variety of NAS configurations I found were on forums of [4PDA](https://4pda.to) in the "What is your pc configurations" thread (Had to [filter](https://4pda.to/forum/index.php?forums=609&topics=69869&act=search&source=pst&query=NAS) by NAS keyword). After week of comparing motherboard/cpu combos I understood that ECC support is the borderline between professional and hobbyist implementations. By restraining myself to no ECC I have narrowed down list of good low power mothers a lot. 
 
-The board has 6 SATA ports, 1 M.2 slot, 1 PCIe x16 gen 3, and 2 PCIe x1.
+I decided to pick MSI B250M PRO-VD with Intel Core i5-6600T. The motherboard MSI b250M PRO-VD has 6 SATA ports, 1 M.2 slot, 1 PCIe x16 gen 3, and 2 PCIe x1. I have talked to [@Mezzy](https://4pda.to/forum/index.php?showuser=2676123), the author of that build on the forum, and got an idea how this combo performs in reality. Better than any documentation. Learned couple tricks for stock bios and went for my first NAS build.
 
-Its chipset supports maximum 2 × 16 GB of RAM, not ECC, but that looked enough for my usage. ECC support is the borderline between professional and hobbyist implementations. By restraining myself to no ECC I have narrowed down list of good low power mothers a lot.
+This core setup supports maximum 2 × 16 GB of RAM and has a 1Gbit RJ45 port + VGA and variety of USB ports for peripherals.
 
 For NVMe cluster + 10 Gbit NIC it is ideal to have two PCIe x16 slots, which was not the case with that mother. I had experience in M.2 - OCuLink conversion, so the idea of using M.2 slot as a second PCIe came quick. Why not put NIC on PCIe x1? PCIe x1 gen 3 provides bandwidth ~985 MB/s. 10 Gbit Ethernet or SFP+ interface requires ~1.25 GB/s. So PCIe x1 is not enough and the NIC goes to M.2 slot through an M.2-to-SFP+ adapter. The chip on that card, an Intel 82599, is PCIe 2.0: on four lanes it's about 2 GB/s which is more than enough.
 
