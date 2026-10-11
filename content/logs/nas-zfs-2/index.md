@@ -49,11 +49,12 @@ part = 2
 
 | # | Part | Model | Price CHF | Where | Condition | Bought | Installed |
 |---|------|-------|-------|-------|-----------|--------|-----------|
-| S1 | NVMe `fast` | 2x 1 TB | - | had them | used | - | - |
-| S2 | HDD `tank` #1 | Seagate IronWolf 6 TB | 200.99 | AliExpress | new | 26.09.2026 | - |
-| S3 | HDD `tank` #2–3 | [2x Seagate IronWolf 6 TB](https://de.aliexpress.com/item/1005012574414150.html) | 2x 202.39 | AliExpress | new | 30.09.2026 | - |
-| S4 | HDD `backup` #1 | Seagate Barracuda 6 TB | - | had it | used | - | - |
-| S5 | HDD `backup` #2 | [Seagate Barracuda 6 TB](https://www.amazon.fr/dp/B07H28SY39) | 139.12 | Amazon.fr | new | 24.03.2025 | - |
+| S1 | NVMe `fast` #1 | [Samsung PM9A1 1 TB](https://www.techpowerup.com/ssd-specs/samsung-pm9a1-1-tb.d786) | - | had it | used | - | - |
+| S2 | NVMe `fast` #2 | [Samsung PM981a 1 TB](https://www.techpowerup.com/ssd-specs/samsung-pm981a-1-tb.d782) | - | had it | used | - | - |
+| S3 | HDD `tank` #1 | Seagate IronWolf 6 TB | 200.99 | AliExpress | new | 26.09.2026 | - |
+| S4 | HDD `tank` #2–3 | [2x Seagate IronWolf 6 TB](https://de.aliexpress.com/item/1005012574414150.html) | 2x 202.39 | AliExpress | new | 30.09.2026 | - |
+| S5 | HDD `backup` #1 | Seagate Barracuda 6 TB | - | had it | used | - | - |
+| S6 | HDD `backup` #2 | [Seagate Barracuda 6 TB](https://www.amazon.fr/dp/B07H28SY39) | 139.12 | Amazon.fr | new | 24.03.2025 | - |
 
 **Total: CHF 745**
 
