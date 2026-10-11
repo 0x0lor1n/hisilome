@@ -21,21 +21,21 @@ part = 2
 | 3 | CPU cooler | [Xilence I250PWM](https://www.galaxus.ch/en/s1/product/xilence-i250pwm-70-mm-cpu-coolers-10144489) | 12.70 | Galaxus.ch | new | 13.03.2025 | 28.04.2025 |
 | 4 | RAM | [Corsair CMK32GX4M2A2666C16R](https://www.corsair.com/ch/en/p/memory/cmk32gx4m2a2666c16r/vengeancea-lpx-32gb-2-x-16gb-ddr4-dram-2666mhz-c16-memory-kit-red-cmk32gx4m2a2666c16r) | 30 | Ricardo.ch | new | 27.03.2025 | 28.04.2025 |
 | 5 | NVMe boot #1 | [Samsung PM9B1 2230 256 GB](https://de.aliexpress.com/item/1005012443075835.html) | 55.51 | AliExpress | new | 03.03.2025 | 10.10.2026 |
-| 6 | NVMe boot #2 | 256 GB | — | — | — | — | — |
+| 6 | NVMe boot #2 | [Samsung PM9B1 2230 256 GB](https://de.aliexpress.com/item/1005012443075835.html) | 42.59 | AliExpress | new | 11.10.2026 | - |
 | 7 | PCIe x1 #1 | [ASM1182e (PCIe x1 → 2x M.2)](https://de.aliexpress.com/item/1005008742918331.html) | 10.09 | AliExpress | new | 27.09.2026 | 10.10.2026 |
-| 8 | PCIe x16 | [ASM2824 (PCIe x16 → 4x M.2)](https://de.aliexpress.com/item/1005012647619070.html) | 74.52 | AliExpress | new | 27.09.2026 | — |
-| 9 | M.2 | [Intel JL82599EN (M.2 → SFP+)](https://de.aliexpress.com/item/1005008046633237.html) | 31.39 | AliExpress | new | 26.09.2026 | — |
-| 10 | PSU | [be quiet! Pure Power 12 M 550 W](https://www.galaxus.ch/en/s1/product/be-quiet-pure-power-12-m-550-w-power-supply-pc-24077999) | 68.45 | Galaxus.ch | used | 08.10.2026 | — |
+| 8 | PCIe x16 | [ASM2824 (PCIe x16 → 4x M.2)](https://de.aliexpress.com/item/1005012647619070.html) | 74.52 | AliExpress | new | 27.09.2026 | - |
+| 9 | M.2 | [Intel JL82599EN (M.2 → SFP+)](https://de.aliexpress.com/item/1005008046633237.html) | 31.39 | AliExpress | new | 26.09.2026 | - |
+| 10 | PSU | [be quiet! Pure Power 12 M 550 W](https://www.galaxus.ch/en/s1/product/be-quiet-pure-power-12-m-550-w-power-supply-pc-24077999) | 68.45 | Galaxus.ch | used | 08.10.2026 | - |
 | 11 | Case | [Thermaltake Divider 200 TG Air](https://www.digitec.ch/en/s1/product/thermaltake-divider-200-tg-air-black-matx-pc-case-16805400) | 65 | Ricardo.ch | new | 01.03.2025 | 28.04.2025 |
 
-**Total: CHF 437**
+**Total: CHF 480**
 
 ### Utilities
 
 | # | Part | Model | Price CHF | Where |
 |---|------|-------|-------|-------|
 | U1 | Cable | [SFP+ DAC Cable, 3 m](https://de.aliexpress.com/item/1005006373736990.html) | 11.23 | AliExpress |
-| U2 | Adapter | Molex → SATA | — | had it |
+| U2 | Adapter | Molex → SATA | - | had it |
 | U3 | Cable | [SATA, 5 pcs](https://de.aliexpress.com/item/1005002966974651.html) | 6.80 | AliExpress |
 | U4 | Mount | [Steel three-storey cage for 3.5" SATA](https://de.aliexpress.com/item/1005006907353405.html) | 10.59 | AliExpress |
 | U5 | Splitter | [4-pin 1→2 on SYS_FAN](https://de.aliexpress.com/item/1005005845263526.html) | 1.70 | AliExpress |
@@ -49,15 +49,15 @@ part = 2
 
 | # | Part | Model | Price CHF | Where | Condition | Bought | Installed |
 |---|------|-------|-------|-------|-----------|--------|-----------|
-| S1 | NVMe `fast` | 2x 1 TB | — | had them | used | — | — |
-| S2 | HDD `tank` #1 | Seagate IronWolf 6 TB | 200.99 | AliExpress | new | 26.09.2026 | — |
-| S3 | HDD `tank` #2–3 | [2x Seagate IronWolf 6 TB](https://de.aliexpress.com/item/1005012574414150.html) | 2x 202.39 | AliExpress | new | 30.09.2026 | — |
-| S4 | HDD `backup` #1 | Seagate Barracuda 6 TB | — | had it | used | — | — |
-| S5 | HDD `backup` #2 | [Seagate Barracuda 6 TB](https://www.amazon.fr/dp/B07H28SY39) | 139.12 | Amazon.fr | new | 24.03.2025 | — |
+| S1 | NVMe `fast` | 2x 1 TB | - | had them | used | - | - |
+| S2 | HDD `tank` #1 | Seagate IronWolf 6 TB | 200.99 | AliExpress | new | 26.09.2026 | - |
+| S3 | HDD `tank` #2–3 | [2x Seagate IronWolf 6 TB](https://de.aliexpress.com/item/1005012574414150.html) | 2x 202.39 | AliExpress | new | 30.09.2026 | - |
+| S4 | HDD `backup` #1 | Seagate Barracuda 6 TB | - | had it | used | - | - |
+| S5 | HDD `backup` #2 | [Seagate Barracuda 6 TB](https://www.amazon.fr/dp/B07H28SY39) | 139.12 | Amazon.fr | new | 24.03.2025 | - |
 
 **Total: CHF 745**
 
-**Build total: CHF 1 218**
+**Build total: CHF 1 261**
 
 ## Not in the build
 
