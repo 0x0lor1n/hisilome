@@ -49,8 +49,8 @@ part = 2
 | S1 | NVMe `rpool` | [Samsung PM9B1 2230 256 GB](https://de.aliexpress.com/item/1005012443075835.html) | 55.51 | AliExpress | new | 03.03.2025 | 10.10.2026 |
 | S2 | NVMe `fast` #1 | [Samsung PM9A1 1 TB](https://www.techpowerup.com/ssd-specs/samsung-pm9a1-1-tb.d786) | - | had it | used | - | 12.10.2026 |
 | S3 | NVMe `fast` #2 | [Samsung PM981a 1 TB](https://www.techpowerup.com/ssd-specs/samsung-pm981a-1-tb.d782) | - | had it | used | - | 12.10.2026 |
-| S4 | HDD `tank` #1 | Seagate IronWolf Pro 6 TB | 200.99 | AliExpress | new | 26.09.2026 | - |
-| S5 | HDD `tank` #2–3 | [2x Seagate IronWolf Pro 6 TB](https://de.aliexpress.com/item/1005012574414150.html) | 2x 202.39 | AliExpress | new | 30.09.2026 | - |
+| S4 | HDD `tank` #1 | Seagate IronWolf Pro 6 TB | 200.99 | AliExpress | new | 26.09.2026 | 12.10.2026 |
+| S5 | HDD `tank` #2–3 | [2x Seagate IronWolf Pro 6 TB](https://de.aliexpress.com/item/1005012574414150.html) | 2x 202.39 | AliExpress | new | 30.09.2026 | 12.10.2026 |
 | S6 | HDD `backup` #1 | Seagate Barracuda 6 TB | - | had it | used | - | - |
 | S7 | HDD `backup` #2 | [Seagate Barracuda 6 TB](https://www.amazon.fr/dp/B07H28SY39) | 139.12 | Amazon.fr | new | 24.03.2025 | - |
 
