@@ -5,8 +5,8 @@ pkgs: hisilome:
 pkgs.mkShellNoCC {
   name = "hisilome";
   packages =
-    (with pkgs; [
-      zola
+    [hisilome.zola]
+    ++ (with pkgs; [
       d2
       ffmpeg
       flac

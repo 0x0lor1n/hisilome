@@ -5,6 +5,7 @@
 # NixOS module passes the host's, flake.nix passes its own pinned one.
 pkgs: let
   lib = pkgs.lib;
+  zola = pkgs.callPackage ./zola-0.22.nix {};
 
   # music/ (1.1 GB, gitignored) and radio/state/ (rewritten every second by a
   # running station) would otherwise churn the site derivation -- and through
@@ -45,7 +46,7 @@ pkgs: let
   # No italic subset is shipped, so italic falls back to regular.
   build-site = pkgs.writeShellApplication {
     name = "build-site";
-    runtimeInputs = [pkgs.d2 pkgs.zola pkgs.coreutils pkgs.findutils pkgs.gnused pkgs.gnugrep pkgs.gawk];
+    runtimeInputs = [pkgs.d2 zola pkgs.coreutils pkgs.findutils pkgs.gnused pkgs.gnugrep pkgs.gawk];
     text = ''
       export D2_FONT_REGULAR=${d2-fonts}/regular.ttf
       export D2_FONT_ITALIC=${d2-fonts}/regular.ttf
@@ -292,7 +293,7 @@ pkgs: let
 in {
   # The three non-derivations are for the NixOS module (nginx.nix) and the dev
   # stack; flake.nix filters them out of `packages`.
-  inherit nginxLocations nginxHttpConfig devNginxConf build-site dev-nginx;
+  inherit zola nginxLocations nginxHttpConfig devNginxConf build-site dev-nginx;
 
   # Marks the station offline (see `fragments`). Run from the unit's
   # ExecStopPost, or by hand in dev. `station-online` clears it.
