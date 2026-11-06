@@ -202,7 +202,7 @@ The content frame slides down, the console squares its corners to meet the panel
 
 ## Not one of the seven: diagrams as text
 
-The d2 diagrams in fiber post are not "embedded" as images. It's a Zola shortcode that does load_data with path to svg + safe filter + inline it in page. Like that the labels on diagram are clickable/selectable, browser find (Ctrl+F) finds them and the theme font is used for diagram text. The .d2 sources live in same directory as post's index.md file. Build-site script builds d2's into svgs before running zola build command.
+The d2 diagrams in the NAS post are not "embedded" as images. It's a Zola shortcode that does load_data with path to svg + safe filter + inline it in page. Like that the labels on diagram are clickable/selectable, browser find (Ctrl+F) finds them and the theme font is used for diagram text. The .d2 sources live in same directory as post's index.md file. Build-site script builds d2's into svgs before running zola build command.
 
 It's not exactly a no-JS trick, but it's the same spirit: do everything at build time, so what you ship is a document, not a viewer app.
 
