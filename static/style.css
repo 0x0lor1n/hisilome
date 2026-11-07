@@ -1603,3 +1603,12 @@ figure.pair.small img {
 .lead {
   color: var(--meta);
 }
+
+/* colophon: brand-coloured inline icons next to the overlay doors and contacts.
+   fill comes from the svg itself, so they stay coloured; only the size and
+   baseline are ours. */
+.ico {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+}
