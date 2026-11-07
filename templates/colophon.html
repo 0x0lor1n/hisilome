@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}{{ section.title | capitalize }} - {{ config.title }}{% endblock title %}
+{% block description %}<meta name="description" content="{{ section.description }}">{% endblock description %}
+
+{% block content %}
+<h1>Colophon</h1>
+{{ section.content | safe }}
+
+<p><a href="/">&larr; back to all posts</a></p>
+{% endblock content %}

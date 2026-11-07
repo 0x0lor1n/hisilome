@@ -13,6 +13,7 @@
 <title>{% block title %}{{ config.title }}{% endblock title %}</title>
 {% block description %}<meta name="description" content="{{ config.description }}">{% endblock description %}
 {%- if page %}{% set og_title = page.title %}{% set og_desc = page.description | default(value="") %}
+{%- elif section and section.description %}{% set og_title = section.title | capitalize %}{% set og_desc = section.description %}
 {%- elif term %}{% set og_title = term.name %}{% set og_desc = "" %}
 {%- elif taxonomy %}{% set og_title = taxonomy.name | capitalize %}{% set og_desc = "" %}
 {%- else %}{% set og_title = config.title %}{% set og_desc = config.description %}{% endif %}
