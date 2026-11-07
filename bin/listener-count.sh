@@ -61,10 +61,14 @@ render() {
     # under set -e, and the file then never updates while the count is at
     # its peak - exactly when listeners are arriving.
     if [ "$peak" -gt "$n" ] 2>/dev/null; then
-      printf ' (peak %s)' "$peak"
+      printf ' · peak %s' "$peak"
     fi
   else
     printf 'connected'
+    # Alone, but the room has been fuller: show the high-water mark.
+    if [ "$peak" -ge 2 ] 2>/dev/null; then
+      printf ' · peak %s' "$peak"
+    fi
   fi
 }
 
