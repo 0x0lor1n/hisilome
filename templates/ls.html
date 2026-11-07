@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}ls - {{ config.title }}{% endblock title %}
+{% block description %}<meta name="description" content="{{ section.description }}">{% endblock description %}
+
+{#- The narrow topbar has no room for the five dirs, so `ls` there is a link
+    and this is its output: the listing lands in the content panel like any
+    other command, and the next click is a `cd` out of it. No popup to close,
+    no state to reset. -#}
+{% block content %}
+<p class="permalink"><span class="cmd">$ ls</span></p>
+<ul class="ls-out">
+<li><a href="/">archive/</a></li>
+<li><a href="/logs/">logs/</a></li>
+<li><a href="/series/">series/</a></li>
+<li><a href="/tags/">tags/</a></li>
+<li><a href="/colophon/">colophon/</a></li>
+</ul>
+{% endblock content %}

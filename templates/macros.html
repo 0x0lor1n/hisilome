@@ -67,17 +67,17 @@
 {% macro shell_topbar(ext=false) %}
 <header class="topbar">
 <span class="ident">0x0lor1n@<a href="/"{% if ext %} target="content"{% endif %} class="prompt">{{ config.title }}</a></span>
-<span class="cmd" aria-hidden="true">$ cd</span>
+<span class="cmd" aria-hidden="true">$</span>
+{#- Wide: `$ ls` with the five dirs on the line. Narrow: the dirs go and
+    `ls` is a link to /ls/, whose page is the listing - the command's output
+    in the content panel, where the next click simply navigates on. -#}
 <nav aria-label="Main">
-<a href="/"{% if ext %} target="content"{% endif %}>./archive</a>
-<span class="cmd" aria-hidden="true">&& cd</span>
-<a href="/logs/"{% if ext %} target="content"{% endif %}>./logs</a>
-<span class="cmd" aria-hidden="true">&& cd</span>
-<a href="/series/"{% if ext %} target="content"{% endif %}>./series</a>
-<span class="cmd" aria-hidden="true">&& cd</span>
-<a href="/tags/"{% if ext %} target="content"{% endif %}>./tags</a>
-<span class="cmd" aria-hidden="true">&& cd</span>
-<a href="/colophon/"{% if ext %} target="content"{% endif %}>./colophon</a>
+<a class="ls-cmd" href="/ls/"{% if ext %} target="content"{% endif %}>ls</a>
+<a class="ls-row" href="/"{% if ext %} target="content"{% endif %}>archive/</a>
+<a class="ls-row" href="/logs/"{% if ext %} target="content"{% endif %}>logs/</a>
+<a class="ls-row" href="/series/"{% if ext %} target="content"{% endif %}>series/</a>
+<a class="ls-row" href="/tags/"{% if ext %} target="content"{% endif %}>tags/</a>
+<a class="ls-row" href="/colophon/"{% if ext %} target="content"{% endif %}>colophon/</a>
 </nav>
 <span class="cursor" aria-hidden="true"><span class="cursor-blink">_</span></span>
 <p class="socials">
@@ -106,7 +106,7 @@
 <span class="rc-br" aria-hidden="true">[</span> channel:
 <span class="rc-on">cyberia</span>
 <span class="rc-br" aria-hidden="true">][</span> link: <a href="/stream.opus"{% if ext %} target="_blank" rel="noopener"{% endif %}>opus</a> <a href="/stream.mp3"{% if ext %} target="_blank" rel="noopener"{% endif %}>mp3</a>
-<details class="sc-toggle"><summary><span class="rc-br" aria-hidden="true">][</span> files: <span class="sc-word">list</span> <span class="rc-br" aria-hidden="true">]</span></summary><div class="sc-panel"><iframe class="sc-frame" src="/schedule.html" title="Schedule"></iframe></div></details>
+<details class="sc-toggle" name="shell"><summary><span class="rc-br" aria-hidden="true">][</span> files: <span class="sc-word">list</span> <span class="rc-br" aria-hidden="true">]</span></summary><div class="sc-panel"><iframe class="sc-frame" src="/schedule.html" title="Schedule"></iframe></div></details>
 </div>
 </section>
 {% endmacro shell_console %}

@@ -187,6 +187,55 @@ a:hover {
   color: var(--hover);
 }
 
+/* `ls` is the command on the wide bar and the link on the narrow one. Wide,
+   it reads as part of the prompt; the dirs beside it are the output. */
+.topbar nav a.ls-cmd {
+  color: var(--meta);
+  text-decoration: none;
+}
+
+.topbar nav a.ls-cmd:hover,
+.topbar nav a.ls-cmd:focus-visible {
+  color: var(--hover);
+  text-decoration: underline;
+}
+
+/* `$ ls` + five dirs end ~505px into the topbar and the socials need 164;
+   under 720 that wraps and pushes the socials onto a second row, so the dirs
+   go and `ls` stays - typed, not yet run; the click is Enter and the listing
+   is the /ls/ page in the content panel. */
+@media (max-width: 720px) {
+  .topbar nav > .ls-row {
+    display: none;
+  }
+  .topbar nav a.ls-cmd {
+    color: var(--link);
+    text-decoration: underline;
+  }
+  .topbar nav a.ls-cmd:hover {
+    color: var(--hover);
+  }
+}
+
+/* output of /ls/ */
+.ls-out {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1.8;
+}
+
+.ls-out a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.ls-out a:hover,
+.ls-out a:focus-visible {
+  color: var(--hover);
+  text-decoration: underline;
+}
+
 .layout {
   margin: 1.25rem 0 0;
   padding: 0;
@@ -658,12 +707,6 @@ main li > strong:first-child {
   }
   .topbar .socials {
     margin-left: 0;
-  }
-  /* The command chain wraps mid-sentence here and lands ./tags on the icon row.
-     Keep the two links, drop the shell grammar. */
-  .topbar .cmd,
-  .topbar .cursor {
-    display: none;
   }
 }
 
@@ -1455,11 +1498,4 @@ figure.pair.small img {
 
 .lead {
   color: var(--meta);
-}
-
-@media (max-width: 640px) {
-  /* Four links now; ./series is the one the list survives without. */
-  .topbar nav a[href="/series/"] {
-    display: none;
-  }
 }
