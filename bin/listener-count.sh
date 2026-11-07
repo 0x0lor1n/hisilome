@@ -1,17 +1,12 @@
 #!/usr/bin/env bash
-# Listener count across every mount, as a display string for the console.
-# The <audio> element offers opus first and mp3 second, so listeners split
-# between the two; counting one mount undercounts the other's audience.
+# Summed over every mount: <audio> offers opus first, so listeners split.
 
 set -euo pipefail
 
 ADMIN="${ADMIN:-admin:hackme}"
 HOST="${HOST:-127.0.0.1:8000}"
 OUT="${OUT:-radio/state/listeners.txt}"
-# All-time peak. icecast's own <listener_peak> is per-mount and resets with
-# the process, so we keep our own maximum next to OUT. radio/state sits on
-# the persistent volume (stateDir = /persist/radio in prod), so it survives
-# reboots on the impermanent host; nothing else touches the file.
+# icecast's <listener_peak> is per-mount and resets with the process.
 PEAK_FILE="${PEAK_FILE:-$(dirname "$OUT")/listener-peak.txt}"
 INTERVAL="${INTERVAL:-30}"
 ONCE=0
@@ -57,9 +52,8 @@ render() {
   # A counter reading 1 advertises emptiness.
   if [ -n "$n" ] && [ "$n" -ge 2 ] 2>/dev/null; then
     printf '%s listening' "$n"
-    # Not `&&`-chained: a false test as the last command fails the function
-    # under set -e, and the file then never updates while the count is at
-    # its peak - exactly when listeners are arriving.
+    # Not `&&`-chained: a false last test fails the function under set -e,
+    # and the file never updated while count == peak.
     if [ "$peak" -gt "$n" ] 2>/dev/null; then
       printf ' · peak %s' "$peak"
     fi

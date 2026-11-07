@@ -10,15 +10,12 @@ processes:
         exit 1
       fi
 
-  # Drafts included by default; SITE_DRAFTS=0 process-compose up ... for the
-  # published view. The env var is read by build-site itself, so the same
-  # switch works for a bare build-site.
+  # SITE_DRAFTS=0 process-compose up ... for the published view.
   build-site:
     command: "build-site"
 
-  # Rebuild public/ on edits; nginx serves the directory, so no reload needed.
-  # zola serve is not used: it drops the SSI fragments the console relies on.
-  # queue, not restart: a build killed halfway leaves public/ half-written.
+  # Not zola serve: it drops the SSI fragments. queue, not restart: a build
+  # killed halfway leaves public/ half-written.
   watch-site:
     command: >
       watchexec

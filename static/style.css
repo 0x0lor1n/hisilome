@@ -33,13 +33,10 @@
   --sakura-pink: #d27e99;
   --carp-yellow: #e6c384;
 
-  /* The panel is this tall AND pushes content by this. Derived, not eyeballed:
-     a fixed height stops matching the moment the row count changes.
-     --sc-rows must match rows_wanted in radio.liq. */
+  /* --sc-rows must match rows_wanted in radio.liq. */
   --sc-rows: 11;
-  /* Fixed, and pinned onto .sc-list li - NOT derived from font metrics. The
-     browser rounds each flex row up to a whole pixel (19.968 + 3.84 -> 24), so
-     a derived height was 0.192px short per row and the panel scrolled. */
+  /* Not derived from font metrics: flex rows round up to whole pixels
+     (19.968 + 3.84 -> 24), a derived height scrolled the panel. */
   --sc-row-h: 24px;
   --sc-body-pad: 1rem;         /* .sc-body padding, top + bottom */
   /* +1px for .sc-frame's bottom border, which border-box takes off the inside */
@@ -200,10 +197,8 @@ a:hover {
   text-decoration: underline;
 }
 
-/* `$ ls` + five dirs end ~505px into the topbar and the socials need 164;
-   under 720 that wraps and pushes the socials onto a second row, so the dirs
-   go and `ls` stays - typed, not yet run; the click is Enter and the listing
-   is the /ls/ page in the content panel. */
+/* `$ ls` + dirs end ~505px in and the socials need 164: under 720 the dirs go,
+   `ls` stays and links to /ls/. */
 @media (max-width: 720px) {
   .topbar nav > .ls-row {
     display: none;
@@ -302,9 +297,7 @@ main > h2:first-child {
   margin: 0 0 0.35rem;
 }
 
-/* Chromatic-aberration fringe borrowed from .tag, but hover-only: post titles
-   wrap to two lines, where the absolutely-positioned clones would sit crooked
-   and smear the resting title. On hover the offset + tear reads as intended. */
+/* Hover-only: titles wrap to two lines, where the absolute clones sit crooked at rest. */
 .post-title {
   position: relative;
   z-index: 0;
@@ -332,10 +325,7 @@ main > h2:first-child {
   color: #3bf0ff;
 }
 
-/* Hover fires a one-shot flash: the title goes yellow and the RGB clones tear
-   for 420ms, then everything settles back to the resting look even while the
-   pointer stays. All of it lives in keyframes so there is no sticky hover
-   state to snap out of. */
+/* One-shot 420ms flash in keyframes: no sticky hover state to snap out of. */
 .post-title:hover {
   animation: title-flash 420ms steps(1, end) 1 forwards;
 }
@@ -387,9 +377,8 @@ main > h2:first-child {
   margin-bottom: 0.4rem;
 }
 
-/* wrap + min-width: the tag span holds a dozen links, and inline-flex defaults
-   to nowrap while flex items refuse to shrink past their content - together
-   that is one unbreakable line wider than a phone. */
+/* inline-flex defaults to nowrap and items will not shrink past content:
+   a dozen tags were one line wider than a phone. */
 .meta span {
   display: inline-flex;
   flex-wrap: wrap;
@@ -452,10 +441,8 @@ p {
 }
 
 pre {
-  /* UA default is `font-family: monospace`, and a bare generic `monospace`
-     makes browsers apply their separate monospace size preference (Firefox:
-     13px by default, whatever the user set otherwise) instead of the body
-     size. Inherit both so code matches the prose exactly. */
+  /* A bare generic `monospace` triggers the browser's separate monospace
+     size preference (Firefox: 13px). */
   font-family: inherit;
   font-size: inherit;
   background: var(--bg-dim);
@@ -492,13 +479,8 @@ blockquote {
   margin-bottom: 1rem;
 }
 
-/* Two-voice dialogue (shortcodes/dialogue.html). One rule down the left of
-   the whole block, every reply is a <p> with a speaker class that owns a
-   colour and a 48x48 pixel avatar (static/img/{kriton,olorin}.png, drawn by
-   scripts/sprites.py). Avatars sit inside the column between the rule and
-   the text, reply text is vertically centred on the avatar; they scale
-   only by whole factors so the pixels stay crisp. Both
-   voices are left-aligned - this is a Platonic dialogue, not a chat. */
+/* shortcodes/dialogue.html. Avatars scale by whole factors only, so the
+   pixels stay crisp. */
 .dialogue {
   --avatar: 48px;
   margin-bottom: 1rem;
@@ -593,18 +575,13 @@ pre code {
   color: inherit;
   background: none;
   border-radius: 0;
-  /* One click selects the whole block, Ctrl+C does the rest. The cost is
-     that a single line cannot be lifted out of a block; snippets here are
-     meant to be taken whole. The "copy" tab (::after) is part of the block,
-     so clicking it selects too - a copy button with no clipboard API. */
+  /* One click selects the whole block; the "copy" tab (::after) is part of
+     it, so clicking it selects too. A single line cannot be lifted out. */
   user-select: all;
   cursor: copy;
 }
 
-/* Corner tabs on fenced blocks: language on the left, "copy" on the right.
-   Zola sets data-lang on <code>; the tabs are absolutely positioned against
-   the non-scrolling <pre>, so they stay put while the code underneath
-   scrolls. */
+/* Positioned against the non-scrolling <pre>, so the tabs stay put while the code scrolls. */
 pre {
   position: relative;
 }
@@ -773,9 +750,7 @@ footer {
   font-style: italic;
 }
 
-/* Outside the card, on the screen's bottom edge: two lines, no rule, the
-   card's bottom margin is its gap. The frame is flex:1 with min-height:0, so
-   this box never squeezes the article. */
+/* The frame is flex:1 with min-height:0, so this box never squeezes the article. */
 .shell-footer {
   flex: 0 0 auto;
   max-width: none;
@@ -823,9 +798,7 @@ footer {
   overflow: hidden;
 }
 
-/* Flex items default to min-width:auto, so one nowrap line in the console
-   (the bracket status row) widened the whole card past the viewport and the
-   content iframe with it - the article was clipped on the right on phones. */
+/* min-width:auto let one nowrap console line widen the card past the viewport on phones. */
 .shell-body > .frame > * {
   min-width: 0;
 }
@@ -844,10 +817,8 @@ body.framed {
   margin: 0;
   border-radius: 10px;
 
-  /* Gradient border via two clips: border-image ignores border-radius and would
-     square the corners. Content layers clip to padding-box, one gradient clips
-     to border-box. The base tone must be a gradient too - background-color
-     always fills to the border box and would cover the ring. */
+  /* Two clips, not border-image (ignores border-radius). The base tone must be
+     a gradient too: background-color fills to the border box and covers the ring. */
   border: 1px solid transparent;
   background:
     repeating-linear-gradient(
@@ -887,13 +858,8 @@ body.framed {
   background: transparent;
 }
 
-/* Retro loader, painted on the frame itself. Off by default: hiding it under
-   an opaque .rc-bar in live.html meant guessing the bar's y to the pixel, and
-   it peeked out (rounding, fonts). Instead /status.html - written by the
-   station unit's ExecStopPost - is SSI-included into <head> while the radio
-   is down and sets --station-ui / --ld-image / --ld-anim; only then the
-   segments crawl where the bar would be, and the player row is hidden.
-   SSI cannot add a class, hence properties. The include IS the switch. */
+/* Off by default; /status.html (SSI-included while the radio is down) sets
+   --station-ui / --ld-image / --ld-anim. SSI cannot add a class, hence properties. */
 .console-live {
   --ld-y: 54px;
   --ld-h: 6px;
@@ -924,9 +890,8 @@ body.framed {
   top: 0.35rem;
 }
 
-/* No filter: grayscale(1) flattened Chrome's dark control into a mid-grey pill
-   with MORE contrast, so it out-shouted the title. Opacity is the honest fix.
-   160px, not 130: below ~150px Chrome drops the volume slider for a kebab. */
+/* Opacity, not grayscale(1): that gave Chrome's control MORE contrast.
+   160px: below ~150px Chrome drops the volume slider for a kebab. */
 .console-audio {
   width: var(--player-w);
   outline: none;
@@ -966,10 +931,7 @@ body.framed {
 
 /* fold */
 
-/* The checkbox stays in the tab order (a hidden input is not focusable);
-   the label is the visible control. :has() is already a dependency of the
-   schedule panel, so the folded state can live on .console without a
-   wrapper. */
+/* Not hidden: a hidden input is not focusable; the label is the visible control. */
 .console-fold {
   position: absolute;
   width: 1px;
@@ -979,9 +941,7 @@ body.framed {
   pointer-events: none;
 }
 
-/* Unfolded: top-left corner of the head, in the title's side padding - the
-   bar runs edge to edge, so vertical centre put the chevron right on it.
-   Folded (below): back to centre of the one 28px row. */
+/* Top-left, not vertical centre: the bar runs edge to edge and centre put the chevron on it. */
 .console-chevron {
   position: absolute;
   left: 0.6rem;
@@ -1028,10 +988,8 @@ body.framed {
   .console-chevron { transition: none; }
 }
 
-/* Folded: one 28px row - chevron, scrolling title, elapsed clock. The frame
-   stays mounted (its refresh keeps the title current) and switches to its
-   one-line layout on its own height; the shell only sets that height. The
-   player is hidden, not removed: <audio> keeps playing at display:none. */
+/* The frame switches to its one-line layout on its own height; the shell
+   only sets that. Hidden, not removed: <audio> keeps playing at display:none. */
 .console:has(.console-fold:checked) .console-head {
   padding: 0.3rem 0.75rem 0.3rem 2.4rem;
 }
@@ -1097,10 +1055,8 @@ body.framed {
 .sc-toggle > summary::-webkit-details-marker { display: none; }
 .sc-toggle > summary::marker { content: ""; }
 
-/* A wrapper, not the iframe: <iframe> is a replaced element and generates no
-   ::before. Kept TRANSPARENT because z-index here forms a stacking context that
-   traps a z-index:-1 child - over an opaque background it would flood the
-   panel. Background and gradient border live on the iframe instead. */
+/* <iframe> is replaced and generates no ::before. Transparent: the stacking
+   context traps a z-index:-1 child, an opaque background would flood the panel. */
 /* Rounded bottom on the wrapper as well as the frame: the corners must not
    depend on the browser clipping an <iframe> to its own border-radius. */
 .sc-panel {
@@ -1114,9 +1070,7 @@ body.framed {
   border-radius: 0 0 10px 10px;
   overflow: hidden;
 
-  /* <details> content is display:none when closed. `allow-discrete` lets
-     display join the transition so the element survives the exit, and
-     @starting-style supplies the entry's missing from-state. */
+  /* allow-discrete lets display join the transition; @starting-style supplies the entry from-state. */
   opacity: 1;
   transform: translateY(0);
   /* One duration for all three: if display finished first the panel would
@@ -1226,9 +1180,7 @@ body.framed {
 .sc-now .sc-a { color: var(--carp-yellow); font-weight: 400; opacity: 0.72; }
 
 @media (max-width: 640px) {
-  /* Compact console: the 180px title padding is gone, so the absolute player
-     would land on the title. Put player and live frame side by side in one
-     row instead of stacking - stacking cost ~90px of a 290px reading area. */
+  /* Side by side, not stacked: stacking cost ~90px of a 290px reading area. */
   .console-head {
     --player-w: 120px;
     flex-direction: row;
@@ -1255,9 +1207,7 @@ body.framed {
   }
 }
 
-/* Inside the fixed-height shell every px is taken from the article. Drop the
-   card padding and the tribute footer on phones; the plain (unframed) page
-   still shows the footer at the end of the post. */
+/* In the fixed-height shell every px comes from the article. */
 @media (max-width: 640px) {
   .shell-body > .frame {
     margin: 0;
@@ -1274,9 +1224,7 @@ body.framed {
   }
 }
 
-/* Prose stays at a readable measure; code, diagrams and tables break out to
-   the full column (the player's width). Full-width prose is ~137 monospace
-   characters, which the eye cannot track back to the next line. */
+/* Full-width prose is ~137 monospace characters; the eye cannot track back. */
 .layout > main {
   max-width: none;
   display: grid;
@@ -1288,13 +1236,8 @@ body.framed {
   min-width: 0;
 }
 
-/* Diagrams are laid out top-to-bottom, so they fit the prose column at their
-   natural size and need no zoom. Cap at the SVG's own width (d2 renders
-   labels at ~16px) so a narrow chain does not get inflated to fill the column.
-   No max-height: the post renders inside the shell's content iframe, where
-   vh is the frame's height (screen minus console), not the screen's. An
-   80vh cap there shrank the 1006px-tall pipeline diagram to about half on a
-   1080p display, labels with it. Tall diagrams scroll with the prose. */
+/* No max-height: inside the content iframe vh is the frame's height, and an
+   80vh cap halved the 1006px pipeline diagram on 1080p. */
 .layout > main > figure {
   margin-left: 0;
   margin-right: 0;
@@ -1307,37 +1250,9 @@ body.framed {
   height: auto;
 }
 
-/* Below the SVG's own width the diagram is scaled down to the column and its
-   labels stop being readable -- recovery is the browser's own pinch-zoom,
-   which re-rasterises the inline SVG as vector (verified at 2.5x: crisp).
-   The rejected alternative was native size in a sideways-scrolling figure:
-   it keeps labels legible but shows a third of a 891px diagram, and a
-   horizontally scrolling box inside a vertically scrolling page eats the
-   swipe. Nothing here may set touch-action or user-scalable. */
+/* Scaled to the column; pinch-zoom re-rasterises inline SVG as vector (crisp
+   at 2.5x). Nothing here may set touch-action or user-scalable. */
 
-/* Two raster screenshots side by side (speedtest cards); stack on phones. */
-figure.pair {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-}
-figure.pair img {
-  flex: 1 1 260px;
-  max-width: calc(50% - 0.375rem);
-  height: auto;
-  border-radius: 6px;
-}
-figure.pair figcaption {
-  flex-basis: 100%;
-  color: var(--meta);
-  font-size: 0.85rem;
-  margin-top: 0.25rem;
-}
-@media (max-width: 640px) {
-  figure.pair img { max-width: 100%; }
-}
 
 /* the sidebar block renders nothing, so centre rather than sit hard left */
 .layout > main:only-child {
@@ -1407,11 +1322,7 @@ figure.pair figcaption {
 
 /* article text fades out as it reaches the player */
 
-/* A sticky band painted over the text, not a scroll-driven mask. The mask
-   version (Chromium-only until Firefox 158) looked no better and needed a
-   registered property plus a scroll container on body; this is one rule and
-   renders the same everywhere. body.framed exists only inside the iframe, so
-   plain pages are unaffected. */
+/* A sticky band, not a scroll-driven mask (Chromium-only until Firefox 158). */
 body.framed::before {
   content: "";
   display: block;
@@ -1419,9 +1330,7 @@ body.framed::before {
   top: 0;
   z-index: 5;
   height: 96px;
-  /* 56px stays in flow; with .layout's 1.25rem the title starts at ~76px,
-     past the 70% stop where the gradient is already fully transparent - so
-     nothing is dimmed at rest. The ramp itself is the 20..70% band. */
+  /* Title starts at ~76px, past the 70% stop where the gradient is transparent. */
   margin-bottom: -40px;
   background: linear-gradient(to bottom, var(--bg) 20%, transparent 70%);
   pointer-events: none;
@@ -1433,9 +1342,7 @@ body.framed::before {
   }
 }
 
-/* Phones: the 76px lead-in above the title is a fifth of the visible article.
-   Halve the band (32px in flow) and drop .layout's top margin - the title
-   lands at ~32px, still past the gradient's transparent stop (70% of 48px). */
+/* 76px above the title was a fifth of the visible article; ~32px is still past the stop. */
 @media (max-width: 640px) {
   body.framed::before {
     height: 48px;
@@ -1448,9 +1355,7 @@ body.framed::before {
 
 /* tag cloud */
 
-/* --t is a 0..1 weight from post count, computed in the template. Glow ramps
-   harder than size: on a young archive the counts are close, and a few px of
-   bloom separates them where a few px of type size does not. */
+/* --t: 0..1 weight from post count, computed in the template. */
 .tagcloud {
   display: flex;
   flex-wrap: wrap;
@@ -1462,10 +1367,8 @@ body.framed::before {
 
 .tag {
   position: relative;
-  /* z-index, not just position: relative. Without it .tag forms NO stacking
-     context, the z-index:-1 fringe below escapes upward and paints behind
-     .frame's opaque background - invisible on the real page. 0 traps the
-     clones inside the tag: behind its text, in front of the card. */
+  /* z-index:0 forms the stacking context; without it the z-index:-1 fringe
+     paints behind .frame's opaque background. */
   z-index: 0;
   font-size: calc(0.95rem + 1.05rem * var(--t, 0));
   line-height: 1.15;
@@ -1475,12 +1378,7 @@ body.framed::before {
   transition: color 160ms, text-shadow 160ms;
 }
 
-/* Chromatic aberration: two colour-separated clones of the word sitting behind
-   it, offset in opposite directions. This is the page background's aperture
-   grille applied to type rather than a new idea imported for effect - a beam
-   that cannot quite converge.
-   The offset scales with --t, so the heaviest tag fringes hardest: the split
-   carries the same information the size and glow do, instead of decorating. */
+/* Chromatic aberration; offset scales with --t. */
 .tag::before,
 .tag::after {
   content: attr(data-name);
@@ -1508,10 +1406,7 @@ body.framed::before {
   text-shadow: 0 0 calc(9px + 20px * var(--t, 0)) rgba(var(--carp-rgb), 0.7);
 }
 
-/* Signal loss on hover: the channels tear into horizontal bands and snap
-   between them. steps(1, end) is doing the work - interpolated, this reads as
-   a smooth wobble; snapped, it reads as a broken scanline. Hover only, and it
-   ends: the resting page still has no motion in it. */
+/* steps(1, end): interpolated this reads as a wobble, snapped as a broken scanline. */
 .tag:hover::before {
   opacity: 0.85;
   animation: tag-tear-r 420ms steps(1, end) 1;
@@ -1557,12 +1452,6 @@ body.framed::before {
   .tag:hover::after { animation: none; }
 }
 
-/* small raster sources (240px FLIR frames): never upscale */
-figure.pair.small img {
-  flex: 0 0 auto;
-  width: 240px;
-  max-width: 100%;
-}
 
 /* Content kind (writeup / worklog / series) in front of a title on mixed
    lists and on log pages. Muted, no chip: a label, not a button. */
@@ -1604,9 +1493,7 @@ figure.pair.small img {
   color: var(--meta);
 }
 
-/* colophon: brand-coloured inline icons next to the overlay doors and contacts.
-   fill comes from the svg itself, so they stay coloured; only the size and
-   baseline are ours. */
+/* colophon icons: fill comes from the svg itself; only size and baseline are ours. */
 .ico {
   width: 1em;
   height: 1em;

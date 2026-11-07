@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# ReplayGain track-gain tags, so liquidsoap reads ~4ms instead of analysing
-# ~5s per track on a single core. EBU R128, target -18 LUFS (ReplayGain 2.0).
-# Existing tags kept unless --force.
+# liquidsoap reads the tag in ~4ms instead of analysing ~5s per track.
+# EBU R128, -18 LUFS. Existing tags kept unless --force.
 
 set -euo pipefail
 
@@ -91,10 +90,8 @@ write_tag() {
     mv "$tmp" "$file"
     ;;
   mp3)
-    # mid3v2 edits the ID3 tag in place. Do NOT remux mp3 with ffmpeg
-    # -c copy: it rewrites the Xing/LAME header, losing encoder delay
-    # and padding, which shifts the decoded audio (measured: +0.09s
-    # and +1 frame per file). mid3v2 leaves the audio bit-identical.
+    # Not ffmpeg -c copy: it rewrites the Xing/LAME header and shifts the
+    # decoded audio (measured: +0.09s and +1 frame per file).
     mid3v2 --TXXX "REPLAYGAIN_TRACK_GAIN:$value" "$file" >/dev/null
     ;;
   *)

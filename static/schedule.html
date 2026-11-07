@@ -3,9 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="color-scheme" content="dark" />
-    <!-- Same interval as the console frame: seconds left on the track (+1),
-         capped at 30, written by liquidsoap. A fixed 15 s here meant the
-         list could trail the title by up to 15 s after a switch. -->
+    <!-- Same interval as the console frame: a fixed 15 s trailed the title by that much. -->
     <!--#block name="refresh_fallback" --><meta http-equiv="refresh" content="10" /><!--#endblock -->
     <!--#include virtual="/refresh.html" stub="refresh_fallback" -->
     <title>Schedule</title>

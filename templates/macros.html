@@ -19,10 +19,8 @@
 </li>
 {% endmacro post_item %}
 
-{#- Every page in the site that declares extra.series = slug, from the two
-    sections that can hold them, sorted by extra.part. Rendered as a list
-    (mode="list") or as the prev/next strip under an article (mode="nav",
-    needs current). Tera macros cannot return arrays, so both live here. -#}
+{#- mode="list" or the prev/next strip (mode="nav", needs current). Tera
+    macros cannot return arrays, so both live here. -#}
 {% macro series_pages(slug, mode, current="") %}
 {%- set writeups = get_section(path="_index.md") %}
 {%- set logs = get_section(path="logs/_index.md") %}
@@ -68,9 +66,7 @@
 <header class="topbar">
 <span class="ident">0x0lor1n@<a href="/"{% if ext %} target="content"{% endif %} class="prompt">{{ config.title }}</a></span>
 <span class="cmd" aria-hidden="true">$</span>
-{#- Wide: `$ ls` with the five dirs on the line. Narrow: the dirs go and
-    `ls` is a link to /ls/, whose page is the listing - the command's output
-    in the content panel, where the next click simply navigates on. -#}
+{#- Narrow: the dirs go and `ls` links to /ls/. -#}
 <nav aria-label="Main">
 <a class="ls-cmd" href="/ls/"{% if ext %} target="content"{% endif %}>ls</a>
 <a class="ls-row" href="/"{% if ext %} target="content"{% endif %}>archive/</a>
@@ -94,9 +90,7 @@
 {% macro shell_console(ext=false) %}
 <section class="console" aria-label="Radio player">
 <div class="console-head">
-{#- Fold is a checkbox, not <details>: the player must stay in the DOM while
-    folded or playback stops. It sits in the shell, so the state outlives
-    every frame navigation; on an unframed page it lasts one document. -#}
+{#- A checkbox, not <details>: closing a <details> drops <audio> and stops playback. -#}
 <input type="checkbox" id="console-fold" class="console-fold" aria-label="Fold the radio console">
 <label for="console-fold" class="console-chevron" aria-hidden="true"></label>
 <iframe class="console-live" src="/live.html" title="Now playing"></iframe>

@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# Pre-shuffled queue, so the schedule has a future to show. Emits, atomically:
-#   queue.m3u  one path per line                 (liquidsoap playlist)
-#   queue.tsv  "<seconds>\t<path>\t<album>"       (schedule writer)
-# Several rounds concatenated: one round of a small library loops in hours.
+# Pre-shuffled so the schedule has a future to show; several rounds, one
+# round of a small library loops in hours. queue.m3u + queue.tsv, atomically.
 
 set -euo pipefail
 

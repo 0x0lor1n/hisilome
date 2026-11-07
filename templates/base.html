@@ -5,9 +5,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-{#- Between the markers: what build-site copies into each page's meta.html
-    for the shell to SSI-include (listen.html overrides the whole block).
-    One element per line; no other comments inside. -#}
+{#- build-site copies the lines between the markers into meta.html: one element
+    per line, no other comments inside. -#}
 {% block head_meta -%}
 <!--meta-->
 <title>{% block title %}{{ config.title }}{% endblock title %}</title>

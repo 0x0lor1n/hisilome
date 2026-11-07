@@ -12,9 +12,7 @@
     lib = pkgs.lib;
     hisilome = import ./nix/packages.nix pkgs;
   in {
-    # nginxHttpConfig / nginxLocations are not derivations (`nix flake check`
-    # would reject them) and devNginxConf is an internal file, not a package;
-    # the module and the dev stack read all three from nix/packages.nix.
+    # Not derivations; `nix flake check` would reject them.
     packages.${system} =
       lib.filterAttrs (_: lib.isDerivation) (removeAttrs hisilome ["devNginxConf"])
       // {default = hisilome.site;};

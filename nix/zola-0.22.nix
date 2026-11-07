@@ -8,10 +8,8 @@
   installShellFiles,
 }:
 
-# nixpkgs' zola at 34ab990, kept verbatim minus the version test. The
-# consumer's nixpkgs (1c89083+) ships 0.23, which is Tera v2: no
-# {% import %}, no macros::, no shortcodes. The templates are written
-# against 0.22; drop this file once they are migrated to components.
+# nixpkgs' zola at 34ab990 minus the version test. 0.23 is Tera v2: no
+# {% import %}, macros:: or shortcodes. Drop once the templates are on components.
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zola";

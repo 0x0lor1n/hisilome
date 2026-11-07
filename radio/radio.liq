@@ -4,15 +4,12 @@ ignore(file.mkdir(perms=0o755, "radio/state/tmp-nowplaying"))
 ignore(file.mkdir(perms=0o755, "radio/state/tmp-console"))
 ignore(file.mkdir(perms=0o755, "radio/state/tmp-schedule"))
 
-# source.elapsed() is the encoder's position; icecast hands each new client
-# <burst-size> bytes at once and they stay that far behind for the session.
-# Keep in sync with icecast.xml. The browser's own ~1.5s jitter buffer is not
-# derivable and is left alone.
+# icecast hands each client <burst-size> bytes at once and they stay that far
+# behind for the session. Keep in sync with icecast.xml.
 stream_latency = 131072. / (128000. / 8.)   # 128 KiB at 128 kbps = 8.192s
 
-# "[Album] - NN Artist - Title.ext" or "kebab-case-name.ext". Fallback for
-# untagged files; keeps the artist/title split as " - " while the kebab pass
-# below turns every other hyphen into a space (a tab holds the place).
+# Fallback for untagged files. A tab parks the artist/title " - " so the
+# kebab pass below can turn every other hyphen into a space.
 def derive_title(filename) =
   name = path.basename(path.remove_extension(filename))
   name = string.replace(pattern="^\\[[^]]*\\][ ]*-[ ]*", fun (_) -> "", name)
@@ -86,10 +83,8 @@ def write_now_playing(m) =
   current_title := title
   album = m["album"]
   current_album := if album == "" then channel_name else album end
-  # Cursor, not a path search: the queue holds several shuffled rounds, so every
-  # path appears more than once and a scan finds the last copy. Confirm against
-  # the filename and only search forward on disagreement, so a skipped track
-  # re-syncs on the next one.
+  # Cursor, not a path search: every path appears once per shuffled round.
+  # Forward search only on disagreement, so a skipped track re-syncs.
   fn = m["filename"]
   rows = queue_rows()
   n = list.length(rows)
@@ -139,20 +134,14 @@ source_password = environment.get(default="hackme", "ICECAST_SOURCE_PASSWORD")
 output.icecast(%mp3, host="127.0.0.1", port=8000,
                password=source_password, mount="/stream.mp3", radio)
 
-# No Safari/iOS: listed first in <audio>, those fall through to mp3. Per-mount
-# burst in icecast.xml matches 8.192 s so stream_latency holds for both.
-#
-# One Ogg logical stream for the whole session: the encoder opens a new one on
-# every track mark / metadata (that is how Ogg carries tags), and Chrome and
-# Firefox <audio> stop decoding at the second BOS page - the listener hears
-# silence until reload. Titles come from on_metadata above, not the container.
+# One Ogg logical stream for the whole session: Chrome and Firefox <audio>
+# stop decoding at the second BOS page (one per track mark otherwise).
 output.icecast(%opus(bitrate=128), format="audio/ogg", host="127.0.0.1", port=8000,
                password=source_password, mount="/stream.opus",
                drop_metadata(merge_tracks(radio)))
 
-# Listener position: while the encoder is under stream_latency into a track the
-# listener still hears the previous one; report that rather than clamp to 0,
-# else the title flips 8s early.
+# Under stream_latency into a track the listener still hears the previous
+# one; clamping to 0 flipped the title 8s early.
 def listener_pos() =
   rows = queue_rows()
   here = current_index()
@@ -229,10 +218,8 @@ def write_console() =
     write(html)
     write(null)
 
-    # The frame's reload interval, included in its <head>: the time left on
-    # the track plus a second, so the reload lands just after the switch and
-    # the bar never opens already 0-10 s in. Between switches, at most 30 s.
-    # A minute is not a track; under 1 s the frame would loop, so 1 is the floor.
+    # Frame reload = time left on the track + 1 s, so the bar never opens
+    # already 0-10 s in. Cap 30 s; floor 1 s or the frame would loop.
     left = int_of_float(du - el) + 1
     refresh =
       if du <= 0. then 10
@@ -321,14 +308,8 @@ def write_schedule() =
   end
 end
 
-# Write the schedule as soon as the encoder switches, so a restart does not
-# leave the previous instance's file - built from a queue that has since been
-# reshuffled - on the page until the first timer tick. At that instant the
-# listener is still stream_latency behind, on the previous track, and
-# listener_pos() rightly keeps "now" there. Nothing used to move it on until
-# the 10 s timer, so the list lagged the title by up to 10 s; the 1 s tick
-# below catches the audible switch and rewrites the schedule the same second
-# the console flips.
+# Written at the encoder switch (a restart must not show the previous
+# instance's reshuffled queue) and again from the 1 s tick when the listener hears it.
 def on_track_change(m) =
   write_now_playing(m)
   write_schedule()

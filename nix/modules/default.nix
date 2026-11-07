@@ -1,9 +1,5 @@
-# The Zola site and the radio station as a NixOS module. Host-agnostic; the
-# consumer sets domain, secrets and firewall.
-#
-# radio.liq and the scripts address everything relative to the working
-# directory (`radio/state/...`, `music`, `public`); the module reproduces that
-# shape under stateDir and runs every unit with WorkingDirectory there.
+# radio.liq and the scripts address everything relative to the working directory;
+# the module reproduces that shape under stateDir and runs every unit there.
 {
   config,
   lib,

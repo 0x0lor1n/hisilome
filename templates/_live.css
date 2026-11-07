@@ -1,10 +1,5 @@
-/* Rules for the now-playing frame (live.html) only. Not a Tera template:
-   build-site splices this file, the @font-face blocks and the :root palette
-   from style.css into templates/live.html. The frame inlines its CSS because
-   it reloads every ten seconds and a linked stylesheet painted an unstyled
-   frame on each reload (the flicker). Nothing in the shell uses .rc-body,
-   .rc-title, .rc-bar, .rc-fill, .rc-clock - the console's own classes
-   (.rc-br, .rc-on) stay in style.css. */
+/* Spliced into live.html by build-site. Inlined because the frame reloads
+   every ten seconds and a linked stylesheet painted it unstyled each time. */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -105,11 +100,8 @@ body {
   .rc-bar { margin: 0.35rem 0 0; }
 }
 
-/* Counters driven by animated <integer> properties; the animation
-   declarations come per-track from liquidsoap in the style attribute.
-   Keyframes hold literals only: var() inside @keyframes is resolved
-   unreliably (Firefox rendered the minute digit stuck at 0), so minutes run
-   0..60 over an hour and the track's start is a negative delay, like the bar. */
+/* Literals only in keyframes: Firefox does not resolve var() there for a
+   registered <integer> (minute digit stuck at 0). Track start is a negative delay. */
 @property --m { syntax: "<integer>"; initial-value: 0; inherits: false; }
 @property --s { syntax: "<integer>"; initial-value: 0; inherits: false; }
 .rc-m { counter-reset: m var(--m); }
@@ -122,10 +114,7 @@ body {
   .rc-m, .rc-s { animation-play-state: paused; }
 }
 
-/* Folded shell. The frame cannot see the shell's checkbox; what it can see is
-   its own height, and the shell gives it 28px when folded. One row: title
-   scrolling on the left, elapsed / total on the right. Album, bar and the
-   listener count go - the full console is one tap away. */
+/* The frame cannot see the shell's checkbox, only its own height: 28px when folded. */
 @media (max-height: 40px) {
   body {
     display: flex;
@@ -147,9 +136,7 @@ body {
     /* fade both ends so the text enters and leaves, not pops */
     mask-image: linear-gradient(to right, transparent, #000 1rem, #000 calc(100% - 1rem), transparent);
   }
-  /* Marquee without JS: hold at the start so it can be read, then slide the
-     whole span out to the left and reset. Every title scrolls - CSS cannot
-     tell whether it overflowed - which is also how a radio ticker reads. */
+  /* Every title scrolls: CSS cannot tell whether it overflowed. */
   .rc-title > span {
     display: inline-block;
     padding: 0 3rem 0 1rem; /* left: at rest the first glyph must clear the mask's 1rem fade */

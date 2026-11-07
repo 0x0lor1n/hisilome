@@ -15,11 +15,8 @@
     add_header X-Content-Type-Options nosniff always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;
   '';
-  # Clearnet only: HSTS and the h3 hint are meaningless (HSTS: harmful) on a
-  # plain-HTTP overlay listener, where the browser could never satisfy them.
-  # Inside the header set, not vhost extraConfig: nginx drops inherited
-  # add_header lines in any location that sets its own, and every location
-  # here does.
+  # Clearnet only: HSTS on a plain-HTTP overlay listener is harmful. Inside the
+  # header set, not vhost extraConfig: a location's add_header drops the inherited set.
   securityHeaders =
     contentHeaders
     + ''
@@ -59,9 +56,7 @@ in {
     services.nginx = {
       enable = true;
 
-      # Reload, not restart: listeners hold /stream.* open for hours and a blog
-      # post must not cut the radio. Only nginx.service changes on a template
-      # edit; liquidsoap and icecast are untouched (measured).
+      # Reload, not restart: listeners hold /stream.* open for hours.
       enableReload = true;
 
       recommendedProxySettings = false; # would override the Icy-MetaData fix

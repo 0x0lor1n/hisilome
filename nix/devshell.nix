@@ -1,6 +1,4 @@
-# Site + station shell. Kept away from any deploy tooling: station work
-# should not pull colmena/secrets, and a host shell should not pull
-# liquidsoap's 2.85 GiB closure.
+# No deploy tooling here: a host shell should not pull liquidsoap's 2.85 GiB closure.
 pkgs: hisilome:
 pkgs.mkShellNoCC {
   name = "hisilome";

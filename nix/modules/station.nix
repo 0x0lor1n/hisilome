@@ -1,6 +1,5 @@
-# process-compose.yaml's graph as systemd units. Not here: build-site (a
-# derivation, built off-host) and tag-music (run on the workstation before
-# rsync; ReplayGain tags travel inside the files).
+# process-compose.yaml's graph as systemd units. tag-music runs on the
+# workstation before rsync: ReplayGain tags travel inside the files.
 {
   config,
   lib,
@@ -109,15 +108,12 @@ in {
         "hisilome-setup.service"
         "hisilome-build-queue.service"
       ];
-      # After icecast but not bound to it: liquidsoap retries the source.
-      # Condition, not failure, on a missing queue: an unsynced library serves
-      # the site with no station instead of crash-looping.
+      # Condition, not failure, on a missing queue: an unsynced library must
+      # not crash-loop the station.
       unitConfig.ConditionPathExists = "${radioState}/queue.m3u";
       serviceConfig =
         {
-          # status.html: empty while up, the offline <style> otherwise. The
-          # shell SSI-includes it; ExecStopPost runs on crash and stop alike,
-          # so a dead liquidsoap hides the player without any client logic.
+          # ExecStopPost runs on crash and stop alike: a dead liquidsoap hides the player.
           ExecStartPre = "${hisilome.station-online}/bin/station-online";
           ExecStart = "${pkgs.liquidsoap}/bin/liquidsoap ${runtime}/radio/radio.liq";
           ExecStopPost = "${hisilome.station-offline}/bin/station-offline";

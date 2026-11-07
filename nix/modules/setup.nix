@@ -9,9 +9,8 @@
   runtime = cfg.stateDir;
   radioState = "${runtime}/radio/state";
 
-  # Own store path per file. `self + "/radio/..."` would make the toplevel
-  # depend on the whole flake source and re-push a 4 GiB closure on every
-  # unrelated edit (measured).
+  # Own store path per file: `self + "/radio/..."` re-pushed a 4 GiB closure
+  # on every unrelated edit (measured).
   radioLiq = builtins.path {
     path = ../../radio/radio.liq;
     name = "radio.liq";
@@ -44,15 +43,8 @@ in {
         ln -sfn ${cfg.site} "${runtime}/public"
         ln -sfn ${radioLiq} "${runtime}/radio/radio.liq"
 
-        # icecast.xml is rendered, not linked: it carries passwords, and store
-        # files are world-readable. <webroot>/<adminroot> are re-pointed too;
-        # the committed file pins a stale store path.
-        #
-        # colmena's deployment.keys land in /run/keys (tmpfs) and are gone after
-        # a reboot until the next apply, so a value resolved on a previous boot
-        # is kept on the persistent volume: key file, then previous boot, then
-        # the committed dev value (loopback-only icecast; nginx proxies only
-        # /stream.*).
+        # Rendered, not linked: store files are world-readable. /run/keys is tmpfs,
+        # gone after a reboot until the next apply, so the last value is kept on disk.
         umask 077
 
         resolve() {  # $1 = key file or empty, $2 = env file, $3 = var name

@@ -64,7 +64,11 @@ rev as the consumer if you want the two `site` outputs byte-identical.
 Options: `enable`, `domain`, `enableACME` (default `true`), `stateDir`
 (default `/var/lib/hisilome`), `site` (default the package), `user`/`group`,
 `sourcePasswordFile`/`adminPasswordFile` (read at unit start, never in the
-store; `null` keeps the loopback-only dev password), `queueRounds`.
+store; `null` keeps the loopback-only dev password), `queueRounds`,
+`overlayListen` (plain-HTTP `{addr, port}` listeners for a Yggdrasil address
+or an onion's local port: no TLS, no HSTS, firewall is yours),
+`onionLocation` (an `.onion` to advertise from the clearnet vhost via the
+`Onion-Location` header; serving it is `overlayListen` + `services.tor`).
 
 The host side - certificate e-mail, firewall, persistence of the ACME state,
 `www.` alias - is the consumer's.

@@ -6,13 +6,8 @@
 {% block content %}
 <h1>Tags</h1>
 
-{#- Normalised weight is computed HERE, not in CSS: dividing by a var() inside
-    calc() is the same class of trick as steps(var()), which this project
-    already found does not reliably parse. Tera hands CSS a plain 0..1 number.
-    span is floored at 1 so an archive where every tag has the same count
-    divides by 1 rather than 0.
-    Counts are bound to a variable before any arithmetic - Tera reads
-    `x | length - 1` as a filter call and fails to parse the subtraction. -#}
+{#- Weight computed here: var() inside calc() does not reliably parse. span floored
+    at 1. Counts bound first: Tera reads `x | length - 1` as a filter call. -#}
 {%- set_global wmax = 1 -%}
 {%- for term in terms -%}
   {%- set n = term.pages | length -%}

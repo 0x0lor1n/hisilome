@@ -1,15 +1,9 @@
-# The rendered site, the station scripts, and the nginx location set shared by
-# the NixOS module and the dev stack so the two cannot drift.
-#
-# Called with the consumer's nixpkgs (`import ./nix/packages.nix pkgs`): the
-# NixOS module passes the host's, flake.nix passes its own pinned one.
+# Called with the consumer's pkgs: the module passes the host's, flake.nix its own.
 pkgs: let
   lib = pkgs.lib;
   zola = pkgs.callPackage ./zola-0.22.nix {};
 
-  # music/ (1.1 GB, gitignored) and radio/state/ (rewritten every second by a
-  # running station) would otherwise churn the site derivation -- and through
-  # it the host toplevel -- on every edit.
+  # music/ (1.1 GB) and radio/state/ (rewritten every second) would churn the host toplevel.
   src = builtins.path {
     path = ../.;
     name = "hisilome-src";
@@ -25,9 +19,7 @@ pkgs: let
       text = builtins.readFile "${src}/bin/${name}.sh";
     };
 
-  # d2 takes .ttf only; the page ships Iosevka as woff2 subsets. Decompress
-  # those rather than pulling iosevka-bin (a .ttc, which d2 also refuses), so
-  # the diagrams use the exact glyph set the prose does.
+  # d2 takes .ttf only (not the .ttc iosevka-bin ships); the page's woff2 subsets, decompressed.
   d2-fonts =
     pkgs.runCommand "hisilome-d2-fonts" {
       nativeBuildInputs = [(pkgs.python3.withPackages (p: [p.fonttools p.brotli]))];
@@ -38,12 +30,7 @@ pkgs: let
       done
     '';
 
-  # d2 -> svg next to each post's index.md before zola build; Zola copies
-  # colocated assets into the page directory and the d2 shortcode inlines the
-  # svg from there. --scale 1 writes width/height on the <svg>, so the browser
-  # draws diagrams at native size instead of stretching a 360px chain to the
-  # column width. classes.d2 is import-only, hence the numbered-file glob.
-  # No italic subset is shipped, so italic falls back to regular.
+  # --scale 1 writes width/height on the <svg>: without it a 360px chain stretches to the column.
   build-site = pkgs.writeShellApplication {
     name = "build-site";
     runtimeInputs = [pkgs.d2 zola pkgs.coreutils pkgs.findutils pkgs.gnused pkgs.gnugrep pkgs.gawk];
@@ -52,24 +39,17 @@ pkgs: let
       export D2_FONT_ITALIC=${d2-fonts}/regular.ttf
       export D2_FONT_BOLD=${d2-fonts}/bold.ttf
       export D2_FONT_SEMIBOLD=${d2-fonts}/bold.ttf
-      # Engine is per file: a leading "# layout: dagre" line overrides elk.
-      # --no-xml-tag: the shortcode inlines the file into HTML, where d2's
-      # <?xml?> prolog is not a prolog but a bogus comment.
+      # A leading "# layout: dagre" line overrides elk. --no-xml-tag: the svg is inlined into HTML.
       find content -name '[0-9]*.d2' -print0 | while IFS= read -r -d "" f; do
         layout=$(sed -n '1,3s/^# layout: *//p' "$f" | head -1)
         d2 --layout "''${layout:-elk}" --theme 200 --pad 10 --scale 1 --no-xml-tag "$f" "''${f%.d2}.svg"
-        # d2 paints its shape palette onto <image> too, where SVG defines
-        # neither attribute. They render nothing (verified: stripping them is
-        # pixel-identical) but are invalid inline, so drop them on the
-        # <image> elements only.
+        # d2 paints stroke/fill onto <image>, invalid there; pixel-identical without.
         sed -i -E 's/(<image[^>]*)\s(stroke|fill)="[^"]*"/\1/g; s/(<image[^>]*)\s(stroke|fill)="[^"]*"/\1/g' "''${f%.d2}.svg"
       done
-      # Drafts are in unless SITE_DRAFTS=0: local builds are for reading what
-      # is not published yet; the deploy derivation sets 0 explicitly.
+      # Drafts in unless SITE_DRAFTS=0; the site derivation sets 0.
       if [ "''${SITE_DRAFTS:-1}" != 0 ]; then set -- --drafts "$@"; fi
       zola build "$@"
 
-      # Where zola wrote; the site derivation passes --output-dir.
       out=public prev=
       for a in "$@"; do
         case $prev in --output-dir | -o) out=$a ;; esac
@@ -77,10 +57,7 @@ pkgs: let
         prev=$a
       done
 
-      # live.html is not a Zola page (it has no <head> to inherit): the frame
-      # document from templates/, with the @font-face blocks and the colour
-      # tokens of style.css plus templates/_live.css inlined at the marker.
-      # One palette; the frame can no longer drift from the shell.
+      # live.html is not a Zola page: style.css's @font-face/:root plus _live.css inlined at the marker.
       css=$(mktemp)
       {
         sed -n '/^@font-face {/,/^}/p' "$out/style.css"
@@ -95,17 +72,14 @@ pkgs: let
         { print }' templates/live.html > "$out/live.html"
       rm -f "$css"
 
-      # Per-page meta.html: the head lines base.html brackets with <!--meta-->
-      # (title, description, og:*), SSI-included by the shell so a framed post
-      # carries its own <title>. Zola cannot emit a second file per page.
+      # <page>/meta.html, SSI-included by the shell so a framed post carries its own <title>.
       find "$out" -name index.html -print0 | while IFS= read -r -d "" f; do
         sed -n '/<!--meta-->/,/<!--\/meta-->/{/<!--/d;/^$/d;p}' "$f" > "''${f%index.html}meta.html"
       done
     '';
   };
 
-  # Fragments liquidsoap writes into radio/state, served outside the site root
-  # so `zola build` cannot delete them.
+  # Written by liquidsoap into radio/state: outside the site root so `zola build` cannot delete them.
   fragments = [
     {
       name = "console.html";
@@ -133,27 +107,18 @@ pkgs: let
       type = "text/plain";
     }
     {
-      # Empty while liquidsoap runs; the station unit's ExecStopPost writes the
-      # offline <style> into it. Missing (never started) falls to the SSI stub.
+      # Empty while liquidsoap runs; ExecStopPost writes the offline <style> into it.
       name = "status.html";
       file = "status.html";
       type = "text/html";
     }
   ];
 
-  # What the shell includes when the station is down. SSI cannot add a class
-  # to <body>, so the fragment is a <style> that flips a custom property;
-  # style.css keys the loader and the hidden player off it.
+  # SSI cannot add a class to <body>, so the fragment flips a custom property instead.
   offlineStyle = "<style>:root{--station-ui:none;--ld-image:var(--ld-loader);--ld-anim:ld-crawl 1.8s steps(14,end) infinite}</style>";
 
-  # A top-level navigation to any page gets the shell, which frames the
-  # original URL via SSI `request_uri` (never rewritten by nginx). The frame's
-  # own request carries Sec-Fetch-Dest: iframe and falls through to the page.
-  # Zola pages end in "/", so assets and streams are untouched. Clients without
-  # Sec-Fetch-Dest (curl, crawlers, old Safari) get the bare page.
-  # `volatile`: a subrequest shares its parent's variable cache, and the
-  # shell's SSI include of <page>/meta.html goes through `/`'s try_files -
-  # with the cached value that served the shell again, forever.
+  # volatile: a subrequest shares the parent's variable cache, and the shell's
+  # meta.html include would get the shell again, forever.
   nginxHttpConfig = ''
     map "$http_sec_fetch_dest$uri" $shell_page {
       volatile;
@@ -161,21 +126,18 @@ pkgs: let
       default         /__none;
     }
 
-    # 1 vCPU, icecast <clients>100</clients>: without these one client holding
-    # a few hundred /stream.* connections takes the station down.
+    # One client holding a few hundred /stream.* connections took the station down (1 vCPU).
     limit_conn_zone $binary_remote_addr zone=stream:1m;
     limit_req_zone  $binary_remote_addr zone=pages:1m rate=10r/s;
     limit_conn_status 429;
     limit_req_status  429;
   '';
 
-  # A shell load is ~10 requests at once (page, css, fonts, two frames, their
-  # fragments), then a fragment every 10s per listener.
+  # A shell load is ~10 requests at once, then a fragment every 10s per listener.
   pageLimit = "limit_req zone=pages burst=40 nodelay;";
 
-  # `stateDir` is where liquidsoap writes (absolute in prod, relative in dev).
-  # `extraHeaders` is repeated in every location that adds its own header:
-  # nginx `add_header` in a location discards the inherited set.
+  # extraHeaders is repeated wherever a location adds its own header:
+  # nginx add_header in a location discards the inherited set.
   nginxLocations = {
     stateDir,
     extraHeaders ? "",
@@ -186,17 +148,14 @@ pkgs: let
         try_files $shell_page $uri $uri/ =404;
       '';
 
-      # Cache-busted by ?v=hash in base.html, so the file itself can be
-      # immutable. Fonts are versioned by name.
+      # Cache-busted by ?v=hash in base.html; fonts are versioned by name.
       "= /style.css".extraConfig = ''
         ${pageLimit}
         add_header Cache-Control "public, max-age=31536000, immutable";
         ${extraHeaders}
       '';
 
-      # Per-page head fragment written by build-site, reached from the
-      # shell's SSI include; nothing in it needs SSI. A miss (404 path) is an
-      # error status, so the include falls to its stub.
+      # A miss is an error status, so the shell's include falls to its stub.
       "~ /meta\\.html$".extraConfig = ''
         ${pageLimit}
         ssi off;
@@ -218,8 +177,7 @@ pkgs: let
         proxy_request_buffering off;
         chunked_transfer_encoding off;
 
-        # Icecast answers "ICY 200 OK" instead of an HTTP status line when the
-        # client sends Icy-MetaData: 1; nginx cannot parse that -> 502.
+        # Icecast answers "ICY 200 OK" to Icy-MetaData: 1; nginx cannot parse that -> 502.
         proxy_set_header Icy-MetaData "";
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -244,8 +202,7 @@ pkgs: let
       })
     fragments);
 
-  # Dev nginx: the same locations in a standalone config. Relative paths
-  # resolve against `-p $PWD` (the repo root).
+  # Relative paths resolve against `-p $PWD`.
   devNginxConf = let
     locs = nginxLocations {stateDir = "radio/state";};
     render = lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: ''
@@ -291,12 +248,9 @@ pkgs: let
     '';
   };
 in {
-  # The three non-derivations are for the NixOS module (nginx.nix) and the dev
-  # stack; flake.nix filters them out of `packages`.
+  # The non-derivations are for nginx.nix and the dev stack; flake.nix filters them out.
   inherit zola nginxLocations nginxHttpConfig devNginxConf build-site dev-nginx;
 
-  # Marks the station offline (see `fragments`). Run from the unit's
-  # ExecStopPost, or by hand in dev. `station-online` clears it.
   station-offline = pkgs.writeShellApplication {
     name = "station-offline";
     text = ''
@@ -332,8 +286,7 @@ in {
     ]
   );
 
-  # Not in process-compose: albums change with the library, not the station,
-  # and a boot-time rewrite would remux the m4a tracks every run.
+  # Not in process-compose: a boot-time rewrite would remux the m4a tracks every run.
   tag-album = mkScript "tag-album" (
     with pkgs; [
       ffmpeg

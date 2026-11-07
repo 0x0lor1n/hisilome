@@ -105,10 +105,8 @@ write_album() {
   local file="$1" value="$2" ext="$3" tmp
   case "$ext" in
   flac)
-    # --no-utf8-convert: the value is already UTF-8. Without it metaflac
-    # converts from the local charset and, failing to resolve a UTF-8
-    # locale, substitutes '#' per byte - an en dash becomes "###", exit
-    # status 0. The read-back below is what caught it.
+    # Without --no-utf8-convert metaflac converts from the local charset
+    # and, lacking a UTF-8 locale, writes '#' per byte with exit 0.
     metaflac --no-utf8-convert \
       --remove-tag=ALBUM --set-tag="ALBUM=$value" "$file"
     ;;
