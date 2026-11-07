@@ -217,11 +217,13 @@ def write_console() =
       end
     sep = if listeners == "" then "" else " · " end
 
+    # The title is wrapped: the folded shell scrolls it (a transform needs
+    # an element, not text). Listeners too: the one-line layout drops them.
     html =
-      '<p class="rc-title">' ^ title ^ '</p>' ^
+      '<p class="rc-title"><span>' ^ title ^ '</span></p>' ^
       '<p class="rc-sub">' ^ album ^ '</p>' ^
       '<div class="rc-bar">' ^ fill ^ '</div>' ^
-      '<p class="rc-clock">' ^ clock_text ^ sep ^ html_escape(listeners) ^ '</p>'
+      '<p class="rc-clock">' ^ clock_text ^ '<span class="rc-ls">' ^ sep ^ html_escape(listeners) ^ '</span></p>'
 
     write = file.write.stream(atomic=true, temp_dir="radio/state/tmp-console", "radio/state/console.html")
     write(html)

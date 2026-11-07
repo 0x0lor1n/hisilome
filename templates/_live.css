@@ -121,3 +121,54 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .rc-m, .rc-s { animation-play-state: paused; }
 }
+
+/* Folded shell. The frame cannot see the shell's checkbox; what it can see is
+   its own height, and the shell gives it 28px when folded. One row: title
+   scrolling on the left, elapsed / total on the right. Album, bar and the
+   listener count go - the full console is one tap away. */
+@media (max-height: 40px) {
+  body {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: 100vh;
+    padding: 0 0.25rem 0 0;
+    text-align: left;
+  }
+  .rc-sub, .rc-bar, .rc-ls { display: none; }
+  .rc-title, .rc-clock { padding: 0; }
+  .rc-clock { display: block; } /* the narrow layout above hid it */
+  .rc-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: clip;
+    /* fade both ends so the text enters and leaves, not pops */
+    mask-image: linear-gradient(to right, transparent, #000 1rem, #000 calc(100% - 1rem), transparent);
+  }
+  /* Marquee without JS: hold at the start so it can be read, then slide the
+     whole span out to the left and reset. Every title scrolls - CSS cannot
+     tell whether it overflowed - which is also how a radio ticker reads. */
+  .rc-title > span {
+    display: inline-block;
+    padding: 0 3rem 0 1rem; /* left: at rest the first glyph must clear the mask's 1rem fade */
+    animation: rc-scroll 16s linear infinite;
+  }
+  @keyframes rc-scroll {
+    0%, 25% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+  .rc-clock {
+    flex: 0 0 auto;
+    font-size: 0.8rem;
+    color: var(--carp-yellow);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .rc-off { font-size: 0.85rem; }
+  @media (prefers-reduced-motion: reduce) {
+    .rc-title > span { animation: none; padding-left: 0; }
+    .rc-title { text-overflow: ellipsis; white-space: nowrap; }
+  }
+}

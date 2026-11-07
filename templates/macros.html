@@ -94,6 +94,11 @@
 {% macro shell_console(ext=false) %}
 <section class="console" aria-label="Radio player">
 <div class="console-head">
+{#- Fold is a checkbox, not <details>: the player must stay in the DOM while
+    folded or playback stops. It sits in the shell, so the state outlives
+    every frame navigation; on an unframed page it lasts one document. -#}
+<input type="checkbox" id="console-fold" class="console-fold" aria-label="Fold the radio console">
+<label for="console-fold" class="console-chevron" aria-hidden="true"></label>
 <iframe class="console-live" src="/live.html" title="Now playing"></iframe>
 <div class="console-play">
 <audio controls class="console-audio" preload="none" aria-label="Cyberia radio stream">

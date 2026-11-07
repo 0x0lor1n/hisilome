@@ -964,6 +964,92 @@ body.framed {
 .console-meta a { color: var(--link); text-decoration: underline; }
 .console-meta a:hover { color: var(--hover); }
 
+/* fold */
+
+/* The checkbox stays in the tab order (a hidden input is not focusable);
+   the label is the visible control. :has() is already a dependency of the
+   schedule panel, so the folded state can live on .console without a
+   wrapper. */
+.console-fold {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Unfolded: top-left corner of the head, in the title's side padding - the
+   bar runs edge to edge, so vertical centre put the chevron right on it.
+   Folded (below): back to centre of the one 28px row. */
+.console-chevron {
+  position: absolute;
+  left: 0.6rem;
+  top: 0.4rem;
+  z-index: 1;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--meta);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), color 120ms;
+}
+
+/* Drawn, not a glyph: Iosevka's ▾ is a 6px speck. Two borders of a square,
+   rotated: a 10px chevron pointing down. */
+.console-chevron::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -8px 0 0 -5px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.console-chevron:hover { color: var(--hover); }
+
+.console-fold:focus-visible + .console-chevron {
+  outline: 1px solid var(--link);
+  outline-offset: 1px;
+}
+
+/* ▸: rotated, not swapped, so the glyph metrics do not jump */
+.console:has(.console-fold:checked) .console-chevron {
+  top: 50%;
+  margin-top: -0.875rem;
+  transform: rotate(-90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console-chevron { transition: none; }
+}
+
+/* Folded: one 28px row - chevron, scrolling title, elapsed clock. The frame
+   stays mounted (its refresh keeps the title current) and switches to its
+   one-line layout on its own height; the shell only sets that height. The
+   player is hidden, not removed: <audio> keeps playing at display:none. */
+.console:has(.console-fold:checked) .console-head {
+  padding: 0.3rem 0.75rem 0.3rem 2.4rem;
+}
+.console:has(.console-fold:checked) .console-live {
+  height: 28px;
+  --ld-y: 11px;
+}
+.console:has(.console-fold:checked) .console-play,
+.console:has(.console-fold:checked) .console-meta {
+  display: none;
+}
+
+/* The schedule toggle is in the hidden status row, so an open panel must
+   close with it. */
+.console:has(.console-fold:checked) .sc-toggle .sc-panel {
+  display: none;
+}
+
 /* schedule disclosure */
 
 /* The panel overlays the frame rather than pushing it: the shell is a
@@ -1015,6 +1101,8 @@ body.framed {
    ::before. Kept TRANSPARENT because z-index here forms a stacking context that
    traps a z-index:-1 child - over an opaque background it would flood the
    panel. Background and gradient border live on the iframe instead. */
+/* Rounded bottom on the wrapper as well as the frame: the corners must not
+   depend on the browser clipping an <iframe> to its own border-radius. */
 .sc-panel {
   position: absolute;
   left: -1px;
@@ -1023,6 +1111,8 @@ body.framed {
   height: var(--panel-h);
   z-index: 5;
   background: none;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
 
   /* <details> content is display:none when closed. `allow-discrete` lets
      display join the transition so the element survives the exit, and
@@ -1078,14 +1168,15 @@ body.framed {
       border-box;
 }
 
-/* square the console's bottom corners, or its radius notches the panel's edge */
-.console:has(.sc-toggle[open]) {
+/* square the console's bottom corners, or its radius notches the panel's edge.
+   Not while folded: the fold hides the panel but <details> stays open. */
+.console:has(.sc-toggle[open]):not(:has(.console-fold:checked)) {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
 /* stop the glow at the seam, or it haloes across the join */
-.console:has(.sc-toggle[open])::before {
+.console:has(.sc-toggle[open]):not(:has(.console-fold:checked))::before {
   bottom: 0;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -1151,6 +1242,11 @@ body.framed {
   }
   /* title + 6px bar; live.html hides album and clock at this width */
   .console-live { height: 40px; --ld-y: 32px; }
+  /* One row here, so the chevron centres on it instead of the top corner */
+  .console-chevron { top: 50%; margin-top: -0.875rem; }
+  /* the chevron sits over the frame's left edge; a long title would run under
+     it. Folded, the head's own padding clears it. */
+  .console:not(:has(.console-fold:checked)) .console-live { margin-left: 1.7rem; }
   .console-meta {
     padding: 0.25rem 0.6rem 0.4rem;
     font-size: 0.7rem;
@@ -1292,6 +1388,14 @@ figure.pair figcaption {
 
 .frame:has(.sc-toggle[open]) .layout {
   margin-top: calc(1.25rem + var(--panel-h));
+}
+
+/* folded console hides the panel; the push must go with it */
+.frame:has(.console-fold:checked) .shell-content {
+  margin-top: 0;
+}
+.frame:has(.console-fold:checked) .layout {
+  margin-top: 1.25rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
