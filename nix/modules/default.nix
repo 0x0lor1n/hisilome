@@ -34,6 +34,39 @@ in {
       default = true;
     };
 
+    overlayListen = mkOption {
+      type = types.listOf (types.submodule {
+        options = {
+          addr = mkOption {
+            type = types.str;
+            example = "[200:1234::1]";
+          };
+          port = mkOption {
+            type = types.port;
+            default = 80;
+          };
+        };
+      });
+      default = [];
+      description = ''
+        Extra plain-HTTP listeners for the same site: a Yggdrasil address, a
+        Tor onion's local port. One server block each, same root and location
+        set, no TLS, no redirect, no HSTS/Alt-Svc. Nothing is opened in the
+        firewall here.
+      '';
+    };
+
+    onionLocation = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      example = "hisilojocbfh7h3qnp5dssb6xukuq2q3sd4jc5hrgajazsokpgsq5pqd.onion";
+      description = ''
+        Advertise this onion on the clearnet host via the Onion-Location
+        header (Tor Browser offers the switch). Serving the onion itself is a
+        listener in overlayListen plus services.tor; this only adds the header.
+      '';
+    };
+
     stateDir = mkOption {
       type = types.path;
       default = "/var/lib/hisilome";
