@@ -4,20 +4,10 @@ The Zola site and the radio station behind [hisilo.me](https://hisilo.me):
 a static site with zero JavaScript, and a liquidsoap → icecast stream whose
 "now playing" UI is nginx SSI over fragments the encoder rewrites.
 
+![hisilo.me: the shell topbar, the radio console, the post list](docs/screenshot.png)
+
 Everything here is relative to the repo root (`radio/state/`, `music/`,
 `public/`), so run commands from here.
-
-## Layout
-
-| path                       | what                                                                |
-| -------------------------- | ------------------------------------------------------------------- |
-| `content/ templates/ static/ syntaxes/ config.toml` | the Zola site; `.d2` diagrams live next to their post |
-| `radio/`                   | `radio.liq`, `icecast.xml`; `radio/state/` is runtime (gitignored)  |
-| `bin/`                     | station scripts, wrapped as packages by `nix/packages.nix`          |
-| `music/`                   | the library - gitignored, rsync it in                               |
-| `nix/packages.nix`         | `pkgs: { site, build-site, … }` - every derivation, one file        |
-| `nix/modules/`             | the NixOS module (`services.hisilome.*`)                            |
-| `nix/devshell.nix`         | the dev shell                                                       |
 
 ## Build and preview
 
@@ -33,6 +23,10 @@ process-compose up -f process-compose.yaml -f process-compose.dev.yaml   # same,
 
 Use `process-compose`, not `zola serve`: the pages carry SSI includes that only
 nginx resolves.
+
+Hooks: `lefthook.yml` runs gitleaks and the formatters/linters for every file
+type in the repo on commit, `nix flake check` (build + vnu over the HTML) on
+push. The tools are in the dev shell; `LEFTHOOK=0 git commit` skips them.
 
 ## Consuming the module
 
