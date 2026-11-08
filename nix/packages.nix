@@ -340,6 +340,10 @@ pkgs: let
   # does not carry it, so every <audio> source fails with MEDIASINK_ERR
   # ("libpulse not found" under MOZ_LOG=cubeb:5). Point the loader at the
   # pinned libpulseaudio; must be the same nixpkgs as the browser (glibc).
+  #
+  # The same autoconfig sets accessibility.blockautorefresh, which silently
+  # ignores <meta http-equiv="refresh">: the live frame would never reload
+  # and the test_live suite would be measuring the host, not the site.
   pw-firefox = pkgs.writeShellApplication {
     name = "pw-firefox";
     text = ''
@@ -355,6 +359,7 @@ pkgs: let
         {
           echo 'user_pref("browser.dom.window.dump.enabled", true);'
           echo 'user_pref("devtools.console.stdout.chrome", true);'
+          echo 'user_pref("accessibility.blockautorefresh", false);'
         } >> "$profile/user.js"
       fi
       exec ${pwBrowsers}/firefox-*/firefox/firefox "$@"
