@@ -181,6 +181,24 @@ def test_shell_carries_page_meta(page, base, query):
     assert og.get_attribute("content") in title
 
 
+@pytest.mark.parametrize("entry", ["/", "/logs/", "post"])
+@pytest.mark.parametrize("query", ["", "?x=1"])
+def test_shell_canonical_is_the_wrapped_page(page, base, entry, query):
+    """A deep entry (/<post>/) is a sticky door: every later hash route hangs
+    off it. The canonical must point search engines and copy-pasters at the
+    page itself, never at /listen/ (a 301) and never with the query."""
+    path = a_post(page, base) if entry == "post" else entry
+    plain = page.request.get(base + path).text()
+    own = plain[plain.index('rel="canonical" href="') + 22 :]
+    own = own[: own.index('"')]
+    assert own.endswith(path)
+
+    shell = page.request.get(base + path + query, headers=DOC).text()
+    assert shell.count('rel="canonical"') == 1
+    assert f'rel="canonical" href="{own}"' in shell
+    assert "/listen/" not in shell.split("<body", 1)[0]
+
+
 def test_unknown_url_404_inside_frame(page, base):
     # The shell itself answers 200: try_files picks the shell for any document path.
     r = page.goto(base + "/nope/")

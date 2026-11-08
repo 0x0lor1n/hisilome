@@ -2,14 +2,20 @@
 {% import "macros.html" as m %}
 
 {#- The capture stops before "?" so a query string cannot turn the include into
-    the page; "\$" because nginx reads a bare "$" as a variable. -#}
+    the page; "\$" because nginx reads a bare "$" as a variable.
+
+    The shell is served for every document URL, so its canonical is the page it
+    wraps ($meta_page), not /listen/ (a 301). Clearnet host on purpose, same as
+    base.html: identity, not the door. -#}
 {% block head_meta -%}
 <!--# block name="meta_stub" --><!--meta-->
 <title>{{ config.title }} - radio</title>
 <meta name="description" content="{{ config.description }}">
 <!--/meta--><!--# endblock -->
-<!--# if expr="$request_uri = /^(?<meta_page>\/([^?.]+\/)?)(\?|\$)/" --><!--# include virtual="${meta_page}meta.html" stub="meta_stub" --><!--# endif -->
+<!--# if expr="$request_uri = /^(?<meta_page>\/([^?.]+\/)?)(\?|\$)/" --><!--# include virtual="${meta_page}meta.html" stub="meta_stub" -->
+<link rel="canonical" href="{{ config.base_url | safe }}<!--# echo var="meta_page" -->"><!--# endif -->
 {% endblock head_meta -%}
+{% block canonical %}{% endblock canonical %}
 
 {#- Only the middle frames navigate, so a link never destroys <audio>. Tribute
     under the card: inside it cost the article ~140px on 1080p.

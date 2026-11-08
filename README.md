@@ -24,6 +24,18 @@ process-compose up -f process-compose.yaml -f process-compose.dev.yaml   # same,
 Use `process-compose`, not `zola serve`: the pages carry SSI includes that only
 nginx resolves.
 
+## URLs
+
+Every document URL (`/`, `/logs/`, `/<post>/`) serves the shell with that page
+in the middle frame; a plain fetch (feed reader, `curl`, an iframe) gets the
+page itself. Routing after that is `#/path/` on the shell, so the entry URL is
+sticky: open `https://hisilo.me/<post>/` and every later click becomes
+`/<post>/#/logs/`. That is by design (the stream never restarts), not a bug;
+the shell's `<link rel="canonical">` always names the wrapped page without the
+query, so search engines and copy-paste land on `/<post>/`, never on `/listen/`.
+Links to other pages inside the site go through `$ link:` (the permalink bar
+on each post), which follows the door you came in from (clearnet, ygg, onion).
+
 Hooks: `lefthook.yml` runs gitleaks and the formatters/linters for every file
 type in the repo on commit, `nix flake check` (build + vnu over the HTML) on
 push. The tools are in the dev shell; `LEFTHOOK=0 git commit` skips them.
