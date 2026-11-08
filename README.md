@@ -36,6 +36,10 @@ nix run .#e2e -- --engine chromium -k router   # pytest args pass through
 nix develop .#e2e        # the same + ruff, for writing tests
 ```
 
+The full run is ~2.5 min (104 tests, both engines), so it is not in the
+hooks: `nix flake check` stays browser-free; run it by hand before pushing
+shell changes.
+
 `tests/e2e/` pins what the shell's design relies on: the CSS router, the
 frames, the one `<audio>` that survives routing and the fold, the SSI
 fragments and the online/offline switch. Tests that touch
