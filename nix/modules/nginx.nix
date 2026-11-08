@@ -21,7 +21,7 @@
   door = origin: ''
     set $hisilome_origin "${origin}";
     ssi on;
-    ssi_types application/rss+xml;
+    ssi_types text/xml application/rss+xml;
     error_page 404 /404.html;
   '';
 
