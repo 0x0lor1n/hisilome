@@ -2,7 +2,6 @@
 title = "A coding terminal in a Dell Latitude 5580 chassis"
 date = 2026-11-01
 description = "A 2017 Latitude chassis around the Precision 3520 Xeon board: parts, benchmarks, undervolt, EC fan curve."
-draft = true
 
 [taxonomies]
 tags = ["coreboot", "firmware", "hardware", "laptop", "worklog"]
