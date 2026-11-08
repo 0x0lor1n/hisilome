@@ -11,14 +11,27 @@
 <!--# if expr="$request_uri = /^(?<meta_page>\/([^?.]+\/)?)(\?|\$)/" --><!--# include virtual="${meta_page}meta.html" stub="meta_stub" --><!--# endif -->
 {% endblock head_meta -%}
 
-{#- Only the middle frame navigates, so a link never destroys <audio>. Tribute
-    under the card: inside it cost the article ~140px on 1080p. -#}
+{#- Only the middle frames navigate, so a link never destroys <audio>. Tribute
+    under the card: inside it cost the article ~140px on 1080p.
+
+    A CSS router: one frame per topbar entry, hidden unless its id is the URL
+    fragment (`#/logs/`), loading=lazy so a hidden frame costs no request. The
+    entry page's frame (.cur) is last and shown when nothing is targeted;
+    `:target ~ .cur` needs no :has(). SSI drops the stack frame that matches the
+    entry route, or the fragment would load the same page twice. -#}
 {% block body %}
+{%- set routes = ["/", "/logs/", "/series/", "/tags/", "/colophon/", "/ls/"] %}
 <body class="shell-body">
 <div class="frame">
 {{ m::shell_topbar(ext=true) }}
 {{ m::shell_console(ext=true) }}
-<iframe class="shell-content" src="<!--# echo var="request_uri" -->" name="content" title="{{ config.title }}"></iframe>
+<div class="shell-content">
+{%- for r in routes %}
+{%- set re = r | replace(from="/", to="\\/") %}
+<!--# if expr="$request_uri != /^{{ re | safe }}(\?|\$)/" --><iframe class="shell-frame" id="{{ r | safe }}" src="{{ r | safe }}" loading="lazy" title="{{ config.title }}{{ r | safe }}"></iframe><!--# endif -->
+{%- endfor %}
+<iframe class="shell-frame cur" src="<!--# echo var="request_uri" -->" title="{{ config.title }}"></iframe>
+</div>
 </div>
 {{ m::shell_footer(ext=true) }}
 </body>

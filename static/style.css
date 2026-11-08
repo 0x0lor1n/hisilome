@@ -716,9 +716,31 @@ footer {
 
 .shell-content {
   flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The CSS router. Frames are display:none until the URL fragment targets them;
+   the entry page's frame (.cur, last in the stack) shows when nothing does.
+   `~` instead of :has(): the fallback is a sibling selector every engine has. */
+.shell-frame {
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
   border: 0;
   background: var(--bg);
+  display: none;
+}
+
+.shell-frame:target,
+.shell-frame.cur {
+  display: block;
+}
+
+.shell-frame:target ~ .cur {
+  display: none;
 }
 
 .lain-tribute {

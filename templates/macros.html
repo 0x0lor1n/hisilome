@@ -69,19 +69,20 @@
 {% endmacro series_strip %}
 
 {#- ext=true renders links for the radio shell's OUTER document, where a plain
-    navigation would replace the shell and stop the stream. -#}
+    navigation would replace the shell and stop the stream: site links become
+    fragments that :target a frame in the stack (see listen.html). -#}
 {% macro shell_topbar(ext=false) %}
 <header class="topbar">
-<span class="ident">0x0lor1n@<a href="/"{% if ext %} target="content"{% endif %} class="prompt">{{ config.title }}</a></span>
+<span class="ident">0x0lor1n@<a href="{% if ext %}#{% endif %}/" class="prompt">{{ config.title }}</a></span>
 <span class="cmd" aria-hidden="true">$</span>
 {#- Narrow: the dirs go and `ls` links to /ls/. -#}
 <nav aria-label="Main">
-<a class="ls-cmd" href="/ls/"{% if ext %} target="content"{% endif %}>ls</a>
-<a class="ls-row" href="/"{% if ext %} target="content"{% endif %}>archive/</a>
-<a class="ls-row" href="/logs/"{% if ext %} target="content"{% endif %}>logs/</a>
-<a class="ls-row" href="/series/"{% if ext %} target="content"{% endif %}>series/</a>
-<a class="ls-row" href="/tags/"{% if ext %} target="content"{% endif %}>tags/</a>
-<a class="ls-row" href="/colophon/"{% if ext %} target="content"{% endif %}>colophon/</a>
+<a class="ls-cmd" href="{% if ext %}#{% endif %}/ls/">ls</a>
+<a class="ls-row" href="{% if ext %}#{% endif %}/">archive/</a>
+<a class="ls-row" href="{% if ext %}#{% endif %}/logs/">logs/</a>
+<a class="ls-row" href="{% if ext %}#{% endif %}/series/">series/</a>
+<a class="ls-row" href="{% if ext %}#{% endif %}/tags/">tags/</a>
+<a class="ls-row" href="{% if ext %}#{% endif %}/colophon/">colophon/</a>
 </nav>
 <span class="cursor" aria-hidden="true"><span class="cursor-blink">_</span></span>
 <p class="socials">
