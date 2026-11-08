@@ -48,6 +48,16 @@ in {
             example = "ygg";
             description = "Door name in the access log and the metrics `entry` label.";
           };
+          origin = mkOption {
+            type = types.str;
+            example = "http://[200:1234::1]";
+            description = ''
+              What a visitor through this door types to reach the site, scheme
+              and host, no trailing slash. The templates echo it (SSI) into
+              the copyable permalinks, og:url and feed links, so a Tor reader
+              gets onion links and not clearnet ones.
+            '';
+          };
         };
       });
       default = [];

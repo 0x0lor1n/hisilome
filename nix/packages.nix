@@ -264,7 +264,9 @@ pkgs: let
         server {
           listen 8099;
           root public;
+          set $hisilome_origin "http://localhost:8099";
           ssi on;
+          ssi_types application/rss+xml;
           error_page 404 /404.html;
           index index.html;
           ${render}

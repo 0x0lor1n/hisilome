@@ -1,3 +1,11 @@
+{% macro abs(url) %}
+{#- An absolute URL for the network the reader came in on. The build knows
+    one base_url; nginx knows the door ($hisilome_origin, set per server
+    block), so the origin is echoed at serve time. default= covers a
+    listener without the variable and the vnu check (SSI cut). -#}
+<!--# echo var="hisilome_origin" default="{{ config.base_url | safe }}" -->{{ url | replace(from=config.base_url, to="") | safe }}
+{%- endmacro abs %}
+
 {% macro post_meta(page) %}
 <div class="meta">
 {#- Worklogs grow as the build goes; a fixed date and reading time would lie. -#}

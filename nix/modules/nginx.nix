@@ -15,6 +15,16 @@
       access_log ${cfg.accessLog.path} hisilome;
     '';
 
+  # The site is built once against the clearnet base_url; each door echoes
+  # its own origin into the page (templates/macros.html `abs`). ssi_types so
+  # the feed gets it too.
+  door = origin: ''
+    set $hisilome_origin "${origin}";
+    ssi on;
+    ssi_types application/rss+xml;
+    error_page 404 /404.html;
+  '';
+
   # 'unsafe-inline' on style-src only: liquidsoap's fragments and the tag cloud
   # use style attributes.
   contentHeaders = ''
@@ -40,6 +50,7 @@
     addr,
     port,
     entry,
+    origin,
   }:
     lib.nameValuePair "${cfg.domain}-${lib.replaceStrings ["[" "]" ":"] ["" "" "_"] addr}-${toString port}" {
       serverName = cfg.domain;
@@ -50,8 +61,7 @@
       ];
       root = "${cfg.site}";
       extraConfig = ''
-        ssi on;
-        error_page 404 /404.html;
+        ${door origin}
         # The slash redirect (/logs -> /logs/) would otherwise name the
         # loopback port the onion maps away: Location: http://x.onion:8081/logs/
         absolute_redirect off;
@@ -92,8 +102,7 @@ in {
             # live.html and schedule.html include fragments liquidsoap writes;
             # without ssi they render an empty hole and still return 200.
             extraConfig = ''
-              ssi on;
-              error_page 404 /404.html;
+              ${door "https://${cfg.domain}"}
               ${logging "clearnet"}
               ${securityHeaders}
             '';
