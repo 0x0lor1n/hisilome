@@ -126,6 +126,20 @@ pkgs: let
       default         /__none;
     }
 
+    # Who knocks: a class, not the string. The class is what the log exporter
+    # labels and Grafana plots; the raw agent stays in the log on the box.
+    # First match wins, so feed readers and tools go before the Mozilla catch-all
+    # (most readers and every headless browser claim Mozilla).
+    map $http_user_agent $hisilome_agent {
+      default                                                   other;
+      ""                                                        none;
+      ~*(bot|crawl|spider|slurp|archiver|scrapy|facebookexternalhit|gptbot|claudebot|ccbot|bytespider|petalbot|semrush|ahrefs|mj12) bot;
+      ~*(feed|rss|reader|tiny.?tiny|miniflux|newsblur|feedly|inoreader|freshrss|akregator|liferea|newsboat|nextcloud|thunderbird) feed;
+      ~*(curl|wget|httpie|python-requests|python-urllib|go-http-client|okhttp|libwww|lwp|java/|axios|node-fetch|undici) tool;
+      ~*(mpv|vlc|ffmpeg|liquidsoap|icecast|foobar|winamp|audacious|clementine|rhythmbox|kodi|lavf|gstreamer|bass/|strawberry|cmus|mpd) player;
+      ~*(mozilla|lynx|w3m|links|dillo|netsurf) browser;
+    }
+
     # One client holding a few hundred /stream.* connections took the station down (1 vCPU).
     limit_conn_zone $binary_remote_addr zone=stream:1m;
     limit_req_zone  $binary_remote_addr zone=pages:1m rate=10r/s;
@@ -140,6 +154,7 @@ pkgs: let
     log_format hisilome escape=json '{'
       '"time":"$time_iso8601",'
       '"entry":"$hisilome_entry",'
+      '"agent":"$hisilome_agent",'
       '"remote_addr":"$remote_addr",'
       '"request":"$request",'
       '"status":$status,'

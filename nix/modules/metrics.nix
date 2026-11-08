@@ -1,7 +1,8 @@
 # What the station tells Prometheus. Two exporters on one address:
 #   node      - the box, plus a textfile the listener poller writes every tick
 #               (listeners per mount, peak, queue length, station/icecast up);
-#   nginxlog  - the access log, folded to status x method x page x entry.
+#   nginxlog  - the access log, folded to status x method x page x entry x agent
+#               (agent = a class nginx derives from the UA: browser/feed/player/bot/tool).
 # No address, UA or referer leaves the box through metrics; those stay in the
 # log file for the consumer to pull.
 {
@@ -57,6 +58,13 @@ in {
               target_label = "entry";
               from = "entry";
               whitelist = ["clearnet"] ++ map (l: l.entry) cfg.overlayListen;
+            }
+            {
+              # The class nginx derived from the user agent (packages.nix map);
+              # the string itself never becomes a label.
+              target_label = "agent";
+              from = "agent";
+              whitelist = ["browser" "feed" "player" "bot" "tool" "none" "other"];
             }
             {
               target_label = "page";
