@@ -114,8 +114,18 @@ EC loop bypassed, guard at PkgTmp 92 / skin 85):
 | EC loop, stock "balanced" | plateau 80 °C, fan climbs 2700 → 4400 and stays there |
 | 4900 | 69 °C sustained |
 
-3000 holds the load; 2500 does not; stock gets there by bouncing off the 3700 step. The rewritten table
-(`ecquiet2`, 54 bytes changed in the EC region, digest recomputed):
+3000 holds the load; 2500 does not; stock gets there by bouncing off the 3700 step.
+
+The EC runs the fan at the max() over all sensors, and each sensor has its own table per mode
+(quiet / balanced / cool). So far this has gone in two rounds.
+
+**Round 1, flashed 31.10** (`cb32-ecquiet`, CPU sensor only, quiet mode): start raised from 75 to 84,
+a 3000 step added between 2500 and 3700. On the bench: 0 rpm until PkgTmp ~82, then 2500 — for 35
+seconds. After that the fan stepped to 2985 and later 3685, neither of which is in the CPU table any
+more: those are the skin and memory sensors' quiet steps taking over the max(). Half a fix.
+
+**Round 2, built 01.11, not flashed** (`ecquiet2`): the same CPU table plus the memory and NGFF
+sensors moved one notch later (start 48, stop 43), so the CPU curve actually decides. Target CPU table:
 
 | Step | rpm | On °C | Off °C |
 |---|---|---|---|
@@ -126,10 +136,15 @@ EC loop bypassed, guard at PkgTmp 92 / skin 85):
 | 4 | 3700 | 96 | 88 |
 | 5 | 4400 | 127 | 90 |
 
-Step 1 now waits for 84 before starting, step 2 is the new 3000 plateau, step 4 is a copy of 3 (same
-padding trick stock uses). Memory and NGFF sensors moved one notch the same way (start 48, stop 43).
-Result, cover on: fan off at idle, no cycling under sustained load, plateau 3700 rpm at 86–88 °C.
-Step 5 stays as the safety.
+Step 4 is a copy of 3 (stock pads the same way), step 5 stays as the safety. Pass criterion for the
+clip session: 0 rpm at idle with the cover on, no on/off cycling under 10 min of load, PkgTmp ≤ 90.
+
+<!-- TODO: result after the ecquiet2 flash -->
+
+One thing learned the hard way in between: the fan mode (quiet / balanced) lives in the EC's VBAT RAM.
+Pull the CMOS cell for a clip session and it silently reverts to balanced — a whole cover-on test run
+was measured against the wrong table before anyone noticed. Firmware should set the mode at boot;
+that is an open item.
 
 ## Boot time
 
@@ -152,5 +167,6 @@ The 22.8 s is one cold memory training (MRC cache empty after a full-chip flash)
 |---|---|---|
 | stock-xeon-20261029.bin | clip dump of the stock chip, the restore point | |
 | deguarded-20261029.bin | ME reconfigured (deguard), Boot Guard off | |
-| cb32-live-20261031.bin | coreboot + edk2, the daily driver | 3133db43… |
-| ecquiet2-dry.bin | same + rewritten EC fan table | 65f9b5bf… |
+| cb32-live-20261031.bin | coreboot + edk2 | 3133db43… |
+| cb32-ecquiet.bin | same + CPU quiet fan curve — **what is on the chip now** | 80f5a0ee… |
+| ecquiet2-dry.bin | + mem/NGFF curves, dry build, not flashed | 65f9b5bf… |
