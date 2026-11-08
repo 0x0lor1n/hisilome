@@ -24,6 +24,7 @@ processes:
       watchexec
       --watch content --watch templates --watch static --watch syntaxes --watch config.toml
       --ignore 'content/**/*.svg'
+      --ignore 'content/**/tmp-*.svg-*' --ignore 'content/**/sed*'
       --debounce 300ms --on-busy-update=queue
       -- build-site
     depends_on:
