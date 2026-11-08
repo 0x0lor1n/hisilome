@@ -13,6 +13,18 @@ pkgs.mkShellNoCC {
       process-compose
       watchexec
       libresprite # static/img/*.png sprites
+      # lefthook.yml: what the commit hook runs. Tools in PATH, no auto-install.
+      lefthook
+      gitleaks
+      alejandra
+      deadnix
+      statix
+      shfmt
+      shellcheck
+      taplo
+      yamllint
+      markdownlint-cli
+      djlint
     ])
     ++ (with hisilome; [
       tag-replaygain
@@ -33,6 +45,8 @@ pkgs.mkShellNoCC {
     echo "tag-album music                              write ALBUM tags from [bracket] prefixes"
     echo "build-queue music                            rebuild the play queue + schedule"
     echo "libresprite static/img/olorin.png            edit the dialogue sprites (48x48, keep the palette)"
+    echo "lefthook run pre-commit                      what the commit hook runs (gitleaks, alejandra, deadnix, statix, shfmt, shellcheck, d2 fmt, taplo, yamllint, markdownlint, djlint)"
+    echo "nix flake check                              what the push hook runs: build the site, vnu over the HTML"
     echo
     echo "NOTE: run these from the repo root -- the configs use relative paths."
   '';

@@ -1,0 +1,4 @@
+# Keep the hand layout: one array element per line, comments where they are.
+[formatting]
+array_auto_collapse = false
+align_comments = false

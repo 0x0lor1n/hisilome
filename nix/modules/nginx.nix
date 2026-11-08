@@ -80,7 +80,7 @@ in {
       virtualHosts =
         {
           ${cfg.domain} = {
-            enableACME = cfg.enableACME;
+            inherit (cfg) enableACME;
             forceSSL = cfg.enableACME;
             quic = cfg.enableACME;
             http3 = cfg.enableACME;

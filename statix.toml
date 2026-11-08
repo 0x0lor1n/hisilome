@@ -1,0 +1,3 @@
+# W20 repeated_keys: a module groups `systemd.services.X` next to the thing X
+# serves, not under one `systemd = {}`; that locality is the point.
+disabled = ["repeated_keys"]

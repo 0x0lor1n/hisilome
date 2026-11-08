@@ -1,0 +1,69 @@
+# Tools come from the devshell PATH (nix/devshell.nix).
+# Sequential: a fixer and the linter of the same file type must not race,
+# and parallel `stage_fixed` would fight over .git/index.lock.
+# alejandra, not nixfmt: the repo is already in that style (the-hive too).
+no_auto_install: true
+glob_matcher: doublestar
+
+pre-commit:
+  jobs:
+    - name: gitleaks
+      run: gitleaks git --staged --no-banner --redact --config .gitleaks.toml
+    # Names and hostnames live outside the repo, see .gitleaks.toml.
+    - name: gitleaks-personal
+      run: |
+        f="${XDG_CONFIG_HOME:-$HOME/.config}/gitleaks/personal.toml"
+        if [ -f "$f" ]; then
+          gitleaks git --staged --no-banner --redact --config "$f"
+        else
+          echo "gitleaks-personal: $f missing, identity check skipped" >&2
+        fi
+
+    - name: alejandra
+      glob: "**/*.nix"
+      stage_fixed: true
+      run: alejandra -q {staged_files}
+    - name: deadnix
+      glob: "**/*.nix"
+      run: deadnix --fail {staged_files}
+    - name: statix
+      glob: "**/*.nix"
+      run: statix check
+
+    - name: shfmt
+      glob: "**/*.sh"
+      stage_fixed: true
+      run: shfmt -w -i 2 -ln bash {staged_files}
+    - name: shellcheck
+      glob: "**/*.sh"
+      run: shellcheck -s bash {staged_files}
+
+    # The .svg next to it is build output (gitignored); fmt touches the source only.
+    - name: d2 fmt
+      glob: "**/*.d2"
+      stage_fixed: true
+      run: d2 fmt {staged_files}
+
+    - name: taplo
+      glob: "**/*.toml"
+      stage_fixed: true
+      run: taplo fmt {staged_files}
+
+    - name: yamllint
+      glob: "**/*.{yml,yaml}"
+      run: yamllint {staged_files}
+
+    - name: markdownlint
+      glob: "**/*.md"
+      run: markdownlint {staged_files}
+
+    # Tera, close enough to jinja for djlint. Rules off in .djlintrc.
+    - name: djlint
+      glob: "templates/**/*.html"
+      run: djlint --lint {staged_files}
+
+# Slow part: zola build + vnu over public/. Guards the push, not every commit.
+pre-push:
+  jobs:
+    - name: nix flake check
+      run: nix flake check

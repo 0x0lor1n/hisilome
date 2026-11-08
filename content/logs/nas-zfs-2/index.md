@@ -154,11 +154,11 @@ Our `tank` (6x 6 TB, ~70 %): ~4 TB of data per drive, resilver 5–7 h.
 
 Sources:
 
-- https://sraidcalculator.com/blog/synology-nas-rebuild-time
-- https://community.synology.com/enu/forum/1/post/140325
-- https://forums.truenas.com/t/long-resilver-time-tl-dr/29218
-- https://www.truenas.com/community/threads/drive-size-and-resilvering-times.95917
-- https://louwrentius.com/zfs-resilver-performance-of-various-raid-schemas.html
+- <https://sraidcalculator.com/blog/synology-nas-rebuild-time>
+- <https://community.synology.com/enu/forum/1/post/140325>
+- <https://forums.truenas.com/t/long-resilver-time-tl-dr/29218>
+- <https://www.truenas.com/community/threads/drive-size-and-resilvering-times.95917>
+- <https://louwrentius.com/zfs-resilver-performance-of-various-raid-schemas.html>
 
 ## Appendix B: power draw and running cost
 
@@ -202,7 +202,7 @@ Meter fee (CHF 7.24/month) is fixed per household and not attributed to the NAS.
 | 14 h standby + 8 h spinning + 2 h load | 70 W | 613 | 166 | 13.8 |
 | Load 24/7 (upper bound) | 163 W | 1428 | 387 | 32.2 |
 
-Source: https://media.sig-ge.ch/documents/tarifs_reglements/electricite/tarifs/tarifs_electricite_tous_clients.pdf
+Source: <https://media.sig-ge.ch/documents/tarifs_reglements/electricite/tarifs/tarifs_electricite_tous_clients.pdf>
 
 ## Appendix C: deferred to the next build
 
@@ -216,4 +216,3 @@ Each needs different hardware or does not pay off at this size.
 | Cold backup of `tank` | Full offline copy in another building: fire, theft, ransomware, operator error | Partial cold only: KeePass DBs + 2FA export on Kingston IronKey, photo archive on an external HDD | 2x 18 TB or a second NAS at another site; rotate monthly; `zfs send` to it, then export and unplug |
 | UPS | Clean shutdown on power loss; no interrupted resilver or scrub; HDD heads park under power, not on a crash | ZFS itself survives a power cut (transactional, copy-on-write); the remaining risk is mechanical and a mid-resilver cut on raidz1 | 600–900 VA line-interactive (APC Back-UPS, Eaton Ellipse), USB, NUT on NixOS with `services.ups`; ~CHF 150–250 |
 | L2ARC | Second-level read cache on NVMe when the working set does not fit in ARC | ARC 32 GB is not saturated by a media workload; L2ARC only helps once ARC hit rate drops; L2ARC headers consume ARC | One NVMe (no mirror needed, loss is harmless), `zpool add tank cache`, persistent since ZFS 2.0; add after seeing `arcstat` hit rate < 90 % |
-

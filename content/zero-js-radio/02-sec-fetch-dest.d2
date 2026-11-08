@@ -44,9 +44,9 @@ nginx: "" {
 shell: "/listen/index.html\nshell + <audio>\n<iframe src=<!--# echo var=request_uri -->>" {class: ours}
 post: /nas-zfs-1/index.html\nbare post {class: box}
 
-nav -> nginx {style.stroke: "#98bb6c"}
-frame -> nginx {style.stroke: "#98bb6c"}
-curl -> nginx {style.stroke: "#727169"}
+nav -> nginx: {style.stroke: "#98bb6c"}
+frame -> nginx: {style.stroke: "#98bb6c"}
+curl -> nginx: {style.stroke: "#727169"}
 nginx -> shell: "document " {style.stroke: "#98bb6c"}
 nginx -> post: iframe / no header {style.stroke: "#98bb6c"}
 shell -> frame: the frame requests\nthe same URL {style.stroke: "#e6c384"; style.stroke-dash: 3}

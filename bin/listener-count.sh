@@ -39,8 +39,8 @@ read_peak() {
   local p
   p="$(cat "$PEAK_FILE" 2>/dev/null || true)"
   case "$p" in
-    '' | *[!0-9]*) echo 0 ;;
-    *) echo "$p" ;;
+  '' | *[!0-9]*) echo 0 ;;
+  *) echo "$p" ;;
   esac
 }
 

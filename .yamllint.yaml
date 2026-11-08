@@ -1,0 +1,4 @@
+# process-compose*.yaml, lefthook.yml. Long lines are commands; leave them.
+extends: relaxed
+rules:
+  line-length: disable

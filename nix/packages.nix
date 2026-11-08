@@ -1,13 +1,13 @@
 # Called with the consumer's pkgs: the module passes the host's, flake.nix its own.
 pkgs: let
-  lib = pkgs.lib;
+  inherit (pkgs) lib;
   zola = pkgs.callPackage ./zola-0.22.nix {};
 
   # music/ (1.1 GB) and radio/state/ (rewritten every second) would churn the host toplevel.
   src = builtins.path {
     path = ../.;
     name = "hisilome-src";
-    filter = path: type: let
+    filter = path: _type: let
       rel = lib.removePrefix (toString ../. + "/") (toString path);
     in
       !(lib.hasPrefix "music" rel || lib.hasPrefix "radio/state" rel || lib.hasPrefix "diagrams/out" rel);
@@ -265,9 +265,33 @@ pkgs: let
       exec nginx -c ${devNginxConf} -p "$PWD" "$@"
     '';
   };
+
+  site = pkgs.runCommand "hisilome-site" {} ''
+    set -e
+    cp -r ${src} s
+    chmod -R u+w s
+    cd s
+    export HOME=$TMPDIR
+    SITE_DRAFTS=0 ${build-site}/bin/build-site --output-dir $out
+  '';
+
+  # vnu over the rendered site. The SSI directives are cut first: nginx
+  # resolves them, the validator sees `<body<!--# if`. meta.html is a fragment
+  # by design (no doctype). Accepted: `@property` (CSS Properties and Values
+  # API, vnu's CSS parser predates it) and aria-hidden on the chevron label.
+  site-html-check = pkgs.runCommand "hisilome-site-html-check" {nativeBuildInputs = [pkgs.validator-nu];} ''
+    cp -r ${site} s
+    chmod -R u+w s
+    find s -name meta.html -delete
+    find s -name '*.html' -exec sed -i -E 's/<!--#[^>]*-->//g' {} +
+    vnu --skip-non-html --errors-only \
+      --filterpattern '(.*aria-hidden.*label.*|.*Unrecognized at-rule .@property.*|.*Bad value .. for attribute .src. on element .iframe.*)' \
+      s
+    touch $out
+  '';
 in {
   # The non-derivations are for nginx.nix and the dev stack; flake.nix filters them out.
-  inherit zola nginxLocations nginxHttpConfig nginxLogFormat devNginxConf build-site dev-nginx;
+  inherit zola nginxLocations nginxHttpConfig nginxLogFormat devNginxConf build-site dev-nginx site site-html-check;
 
   station-offline = pkgs.writeShellApplication {
     name = "station-offline";
@@ -283,15 +307,6 @@ in {
       mv radio/state/status.html.tmp radio/state/status.html
     '';
   };
-
-  site = pkgs.runCommand "hisilome-site" {} ''
-    set -e
-    cp -r ${src} s
-    chmod -R u+w s
-    cd s
-    export HOME=$TMPDIR
-    SITE_DRAFTS=0 ${build-site}/bin/build-site --output-dir $out
-  '';
 
   tag-replaygain = mkScript "tag-replaygain" (
     with pkgs; [

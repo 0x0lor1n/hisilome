@@ -24,7 +24,6 @@ To be fair nobody forced me. I did not start my car with a position "fuck javasc
 
 Zola - builds static pages of site, liquidsoap + icecast - runs radio station + provides the stream to Icecast, nginx - serves all that stuff to end-users all is configured with just one nixos module and one process-compose.yaml for development loop.
 
-
 {% dialogue() %}
 KRITON. Seven. You are going to walk me through seven.
 

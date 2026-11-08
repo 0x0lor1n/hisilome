@@ -7,7 +7,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }: let
   cfg = config.services.hisilome;
@@ -24,7 +23,7 @@ in {
 
     services.prometheus.exporters.node = {
       enable = true;
-      listenAddress = m.listenAddress;
+      inherit (m) listenAddress;
       port = m.nodePort;
       enabledCollectors = ["systemd" "textfile"];
       extraFlags = ["--collector.textfile.directory=${textfileDir}"];
@@ -40,7 +39,7 @@ in {
 
     services.prometheus.exporters.nginxlog = {
       enable = true;
-      listenAddress = m.listenAddress;
+      inherit (m) listenAddress;
       port = m.nginxlogPort;
       # The log is 0750 nginx:nginx (LogsDirectoryMode); DynamicUser cannot
       # take a supplementary group, so a static user in nginx's group.

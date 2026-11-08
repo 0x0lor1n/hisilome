@@ -12,6 +12,7 @@ part = 1
 +++
 - **Built:** [MSI b250m PRO-VD](https://www.msi.com/Motherboard/B250M-PRO-VD/Specification) + [i5-6600T](https://www.intel.com/content/www/us/en/products/sku/88189/intel-core-i56600t-processor-6m-cache-up-to-3-50-ghz/specifications.html), NixOS, 10 Gbit SFP+, ZFS: hot data (1TB NVMe mirror, 12TB RAIDZ1), warm data (12TB).
 - **Budget:** ~CHF 1300 with all drives.
+
 ## Lyrical hook
 
 For past ~20 years I have collected data of different type. Not so much though (~4 TB). Four years ago I started doing outdoor activities and got a GoPro. The thing is very video hungry and I am dumping it too slow.
@@ -45,7 +46,7 @@ Since that moment I wanted a better solution. A year ago I became tired of my ot
 Any project starts with "1. Recon" in notebook. I started the old school way: looking for engineers that I know at work/telegram/www. Most of the people were using [Synology](https://en.wikipedia.org/wiki/Synology); in top-tier lists there was only one alternative - [QNAP](https://en.wikipedia.org/wiki/QNAP); also, on forums I discovered [TrueNAS](https://github.com/truenas) and an enterprise scale hardware setups based on [Supermicro](https://www.reddit.com/r/supermicro/) motherboards.
 
 Synology quickly became not my cup of tea for two reasons: proprietary software [DiskStation Manager](https://www.synology.com/it-it/dsm); proprietary RAID array ([Synology Hybrid Raid](https://kb.synology.com/DSM/tutorial/What_is_Synology_Hybrid_RAID_SHR) = [mdadm](https://github.com/md-raid-utilities/mdadm/) + [LVM](https://en.wikipedia.org/wiki/Logical_volume_management)). Two cool things it offered from my point of view - [ECC memory](https://en.wikipedia.org/wiki/ECC_memory) support out of the box and possibility to add drives of different size via SHR. 2 pennies for the DSM: two pals set up their [DS923+](https://www.synology.com/it-it/store/Refurbished%20DS923%2B) in one evening and never thought about it again.
-QNAP - same story. 
+QNAP - same story.
 
 Vendor limitations can be removed by spending couple evenings setting up software layer yourself and like that get 100% freedom of choice on software and hardware selection/upgrades. With that concept in mind I started to read how TrueNAS is constructed and what enterprise offers.
 
@@ -109,7 +110,7 @@ Result: at least 5 SATA ports and 6 or more NVMe slots. Already at this point it
 - Well-ventilated case to keep the microclimate healthy.
 - No [TPM](https://it.wikipedia.org/wiki/Trusted_Platform_Module) needed. PII will be encrypted with [AT88CK590](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8945-CryptoAuth-USB-Dongle-Demo-Eval-Kits-Hardware-UserGuide.pdf) and Keepass stored password as fallback, and in all my projects I use age + TPM encryption from the host for PII and sensitive data. Nothing to encrypt on this machine. That opens the market of old motherboards = noice.
 
-With picture somewhat clear it was time to go deep into home lab corners of internet. A variety of NAS configurations I found were on forums of [4PDA](https://4pda.to) in the "What is your pc configurations" thread (Had to [filter](https://4pda.to/forum/index.php?forums=609&topics=69869&act=search&source=pst&query=NAS) by NAS keyword). After week of comparing motherboard/cpu combos I understood that ECC support is the borderline between professional and hobbyist implementations. By restraining myself to no ECC I have narrowed down list of good low power mothers a lot. 
+With picture somewhat clear it was time to go deep into home lab corners of internet. A variety of NAS configurations I found were on forums of [4PDA](https://4pda.to) in the "What is your pc configurations" thread (Had to [filter](https://4pda.to/forum/index.php?forums=609&topics=69869&act=search&source=pst&query=NAS) by NAS keyword). After week of comparing motherboard/cpu combos I understood that ECC support is the borderline between professional and hobbyist implementations. By restraining myself to no ECC I have narrowed down list of good low power mothers a lot.
 
 I decided to pick MSI B250M PRO-VD with Intel Core i5-6600T. The motherboard MSI b250M PRO-VD has 6 SATA ports, 1 M.2 slot, 1 PCIe x16 gen 3, and 2 PCIe x1. I have talked to [@Mezzy](https://4pda.to/forum/index.php?showuser=2676123), the author of that build on the forum, and got an idea how this combo performs in reality. Better than any documentation. Learned couple tricks for stock bios and went for my first NAS build.
 
