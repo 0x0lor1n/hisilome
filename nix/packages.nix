@@ -335,9 +335,15 @@ pkgs: let
   # although Juggler works. Re-enable both prefs in the per-launch profile
   # before the real binary starts; `firefox_user_prefs` cannot do it, it is
   # applied after the handshake.
+  #
+  # Audio: cubeb dlopens libpulse.so.0 by name and the nixpkgs browser bundle
+  # does not carry it, so every <audio> source fails with MEDIASINK_ERR
+  # ("libpulse not found" under MOZ_LOG=cubeb:5). Point the loader at the
+  # pinned libpulseaudio; must be the same nixpkgs as the browser (glibc).
   pw-firefox = pkgs.writeShellApplication {
     name = "pw-firefox";
     text = ''
+      export LD_LIBRARY_PATH=${pkgs.libpulseaudio}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
       profile=""
       prev=""
       for a in "$@"; do
@@ -355,10 +361,22 @@ pkgs: let
     '';
   };
 
+  # 30 s of sine as Ogg/Opus. The console tests serve it in place of
+  # /stream.opus through a Playwright route, so playback is checked without
+  # icecast and without a binary asset in the repo.
+  e2eTone =
+    pkgs.runCommand "e2e-tone.opus" {
+      nativeBuildInputs = [pkgs.ffmpeg-headless];
+    } ''
+      ffmpeg -v error -f lavfi -i "sine=frequency=440:duration=30" \
+        -c:a libopus -b:a 24k -f ogg "$out"
+    '';
+
   e2eEnv = ''
     export PLAYWRIGHT_BROWSERS_PATH=${pwBrowsers}
     export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1
     export PLAYWRIGHT_FIREFOX_EXECUTABLE=${pw-firefox}/bin/pw-firefox
+    export E2E_TONE=${e2eTone}
   '';
 
   # `nix run .#e2e [pytest args]`: the suite against the dev stack (E2E_BASE,

@@ -37,10 +37,15 @@ nix develop .#e2e        # the same + ruff, for writing tests
 ```
 
 `tests/e2e/` pins what the shell's design relies on: the CSS router, the
-frames, the SSI fragments and the online/offline switch. Tests that touch
+frames, the one `<audio>` that survives routing and the fold, the SSI
+fragments and the online/offline switch. Tests that touch
 `radio/state/` go through the `radio_state` fixture, which pauses liquidsoap
 and `listener-count` over the process-compose API (`E2E_PC`, default
 `:8081`, set in `process-compose.yaml`) and puts the real files back.
+Playback tests answer `/stream.opus` from a generated tone (`E2E_TONE`), so
+icecast is not involved. Firefox runs through the `pw-firefox` wrapper,
+which fixes the launch handshake and gives it a `libpulse` (see
+`nix/packages.nix`).
 Not a flake check and not a hook: it needs the running stack, run it by hand.
 Browsers are ~1 GB, hence the separate shell.
 

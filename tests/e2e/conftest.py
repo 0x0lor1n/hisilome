@@ -230,3 +230,62 @@ class NavToken:
 @pytest.fixture
 def nav_token(page):
     return NavToken(page)
+
+
+class Console:
+    """The shell's radio console: one <audio>, fold checkbox, live frame."""
+
+    def __init__(self, page: Page):
+        self.page = page
+        self.audio = page.locator("audio.console-audio")
+        self.fold = page.locator("#console-fold")
+        self.chevron = page.locator("label.console-chevron")
+
+    def state(self) -> dict:
+        return self.audio.evaluate(
+            "a => ({paused: a.paused, time: a.currentTime,"
+            " src: a.currentSrc, error: a.error && a.error.code})"
+        )
+
+    def play(self):
+        """Start playback as a script would after a user gesture.
+
+        The native controls' play button has no stable hit box across engines
+        (Chromium 54 px tall, Firefox 40), so play() is called directly; the
+        test still checks that the element plays, which is what matters.
+        """
+        self.audio.evaluate("a => a.play()")
+
+    def wait_advancing(self, seconds: float = 1.0):
+        """currentTime moved forward by at least `seconds` -- real decoding, not
+        just `paused == false`, which Firefox reports even with no audio sink."""
+        t0 = self.state()["time"]
+        self.page.wait_for_function(
+            "([a, t]) => !a.paused && a.currentTime >= t",
+            arg=[self.audio.element_handle(), t0 + seconds],
+            timeout=10_000,
+        )
+
+
+@pytest.fixture
+def tone(page) -> Path:
+    """Serve 30 s of Opus as /stream.opus in this page, not icecast's stream.
+
+    Icecast's live stream is infinite and may be absent (liquidsoap stopped by
+    `paused_writers`); the console tests only need an <audio> that decodes.
+    The file comes from the e2e env (E2E_TONE, built in nix/packages.nix).
+    """
+    path = Path(os.environ.get("E2E_TONE", ""))
+    if not path.name or not path.exists():
+        pytest.skip("E2E_TONE not set; run through `nix run .#e2e` or the e2e shell")
+    body = path.read_bytes()
+    page.route(
+        "**/stream.opus",
+        lambda route: route.fulfill(status=200, content_type="audio/ogg", body=body),
+    )
+    return path
+
+
+@pytest.fixture
+def console(page) -> Console:
+    return Console(page)
