@@ -126,6 +126,16 @@ pkgs: let
       default         /__none;
     }
 
+    # A link inside a shell frame points at the shell's own URL plus the page
+    # as a fragment (templates/macros.html `href`): :target flips the frame,
+    # nothing reloads. The shell URL is the frame's Referer (same origin, so
+    # the policy sends the path; fragments never travel in Referer). Empty
+    # outside a frame, or when the frame has no referrer: a plain link.
+    map "$http_sec_fetch_dest $http_referer" $shell_href {
+      "~^iframe (?<shell_url>https?://[^#?]+/)$"  "$shell_url#";
+      default                                     "";
+    }
+
     # Who knocks: a class, not the string. The class is what the log exporter
     # labels and Grafana plots; the raw agent stays in the log on the box.
     # First match wins, so feed readers and tools go before the Mozilla catch-all
@@ -179,6 +189,12 @@ pkgs: let
       "/".extraConfig = ''
         ${pageLimit}
         try_files $shell_page $uri $uri/ =404;
+      '';
+
+      # The shell template lives at /listen/ only so zola renders it; as an
+      # entry URL it would frame itself. Every page is the shell already.
+      "= /listen/".extraConfig = ''
+        return 301 /;
       '';
 
       # Cache-busted by ?v=hash in base.html; fonts are versioned by name.

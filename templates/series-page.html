@@ -8,5 +8,5 @@
 <h1><span class="kind">series</span> {{ page.title }}</h1>
 {{ page.content | safe }}
 {{ macros::series_pages(slug=page.slug, mode="list") }}
-<p><a href="/series/">&larr; all series</a></p>
+<p><a {{ macros::href(path="/series/") }}>&larr; all series</a></p>
 {% endblock content %}

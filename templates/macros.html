@@ -6,6 +6,15 @@
 <!--# echo var="hisilome_origin" default="{{ config.base_url | safe }}" -->{{ url | replace(from=config.base_url, to="") | safe }}
 {%- endmacro abs %}
 
+{#- An internal link that survives the radio shell. Inside a shell frame nginx
+    sets $shell_href to the shell's URL plus "#" (nix/packages.nix map), so
+    the href becomes `<shell>#/path/` with target=_top: the shell's :target
+    flips to that page's frame, nothing reloads, <audio> lives. Elsewhere
+    $shell_href is empty and this is a plain link. -#}
+{% macro href(path) -%}
+href="<!--# echo var="shell_href" default="" -->{{ path | safe }}"<!--# if expr="$shell_href" --> target="_top"<!--# endif -->
+{%- endmacro href %}
+
 {% macro post_meta(page) %}
 <div class="meta">
 {#- Worklogs grow as the build goes; a fixed date and reading time would lie. -#}
@@ -21,7 +30,7 @@
     pages) where a writeup and a worklog sit next to each other. -#}
 {% macro post_item(page, kind=false, summary=true) %}
 <li>
-<h3>{% if kind %}<span class="kind">{% if page.components.0 == "logs" %}worklog{% else %}writeup{% endif %}</span> {% endif %}<a class="post-title" href="{{ page.path | safe }}" data-name="{{ page.title }}">{{ page.title }}</a></h3>
+<h3>{% if kind %}<span class="kind">{% if page.components.0 == "logs" %}worklog{% else %}writeup{% endif %}</span> {% endif %}<a class="post-title" {{ self::href(path=page.path) }} data-name="{{ page.title }}">{{ page.title }}</a></h3>
 {{ self::post_meta(page=page) }}
 {% if summary and page.description %}<p class="summary">{{ page.description }}</p>{% endif %}
 </li>
@@ -54,8 +63,8 @@
     {%- if not loop.last %}{%- set_global next = parts | nth(n=loop.index0 + 1) %}{%- endif %}
   {%- endif %}
 {%- endfor %}
-{%- if prev %}<a href="{{ prev.path | safe }}" title="{{ prev.title }}">&larr; #{{ prev.extra.part }}</a>{% else %}<span class="off">&larr;</span>{% endif %}
-{%- if next %}<a href="{{ next.path | safe }}" title="{{ next.title }}">#{{ next.extra.part }} &rarr;</a>{% else %}<span class="off">&rarr;</span>{% endif %}
+{%- if prev %}<a {{ self::href(path=prev.path) }} title="{{ prev.title }}">&larr; #{{ prev.extra.part }}</a>{% else %}<span class="off">&larr;</span>{% endif %}
+{%- if next %}<a {{ self::href(path=next.path) }} title="{{ next.title }}">#{{ next.extra.part }} &rarr;</a>{% else %}<span class="off">&rarr;</span>{% endif %}
 {%- endif %}
 {% endmacro series_pages %}
 
@@ -64,7 +73,7 @@
 {% macro series_strip(page) %}
 {%- if page.extra.series is defined %}
 {%- set s = get_page(path="series/" ~ page.extra.series ~ ".md") %}
-<p class="series-strip"><span class="cmd">$ series:</span> <a href="{{ s.path | safe }}">{{ s.title }}</a> <span class="part">#{{ page.extra.part }}</span> {{ self::series_pages(slug=page.extra.series, mode="nav", current=page.path) }}</p>
+<p class="series-strip"><span class="cmd">$ series:</span> <a {{ self::href(path=s.path) }}>{{ s.title }}</a> <span class="part">#{{ page.extra.part }}</span> {{ self::series_pages(slug=page.extra.series, mode="nav", current=page.path) }}</p>
 {%- endif %}
 {% endmacro series_strip %}
 

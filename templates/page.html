@@ -12,5 +12,5 @@
 {{ macros::series_strip(page=page) }}
 {{ page.content | safe }}
 
-<p><a href="/">&larr; back to all posts</a></p>
+<p><a {{ macros::href(path="/") }}>&larr; back to all posts</a></p>
 {% endblock content %}

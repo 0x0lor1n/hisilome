@@ -9,7 +9,7 @@
 <ul class="post-list">
 {% for s in section.pages %}
 <li>
-<h3><a class="post-title" href="{{ s.path | safe }}" data-name="{{ s.title }}">{{ s.title }}</a></h3>
+<h3><a class="post-title" {{ macros::href(path=s.path) }} data-name="{{ s.title }}">{{ s.title }}</a></h3>
 <p class="summary">{{ s.description }}</p>
 </li>
 {% endfor %}

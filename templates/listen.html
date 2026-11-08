@@ -20,7 +20,13 @@
     `:target ~ .cur` needs no :has(). SSI drops the stack frame that matches the
     entry route, or the fragment would load the same page twice. -#}
 {% block body %}
-{%- set routes = ["/", "/logs/", "/series/", "/tags/", "/colophon/", "/ls/"] %}
+{%- set_global routes = ["/", "/logs/", "/series/", "/tags/", "/colophon/", "/ls/"] %}
+{%- set writeups = get_section(path="_index.md") %}
+{%- set logs = get_section(path="logs/_index.md") %}
+{%- set series = get_section(path="series/_index.md") %}
+{%- for p in writeups.pages | concat(with=logs.pages) | concat(with=series.pages) %}
+  {%- set_global routes = routes | concat(with=[p.path]) %}
+{%- endfor %}
 <body class="shell-body">
 <div class="frame">
 {{ m::shell_topbar(ext=true) }}
