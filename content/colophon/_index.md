@@ -1,6 +1,6 @@
 +++
 title = "colophon"
-description = "What this site runs on and what it does not: Zola, nginx, NixOS, Snowcore, Njalla, Monero. No JavaScript, no Cloudflare, no analytics."
+description = "What this site runs on and what it does not: Zola, nginx, NixOS, Snowcore, Njalla, Monero. No JavaScript, no Cloudflare, no third parties; logs stay on my boxes."
 template = "colophon.html"
 +++
 ## Build
@@ -22,7 +22,7 @@ template = "colophon.html"
 
 - No JavaScript. Clock, player, progress are CSS and SSI.
 - No Cloudflare, CDN or proxy.
-- No analytics, pixels, cookies.
+- No pixels, cookies, third parties. Server logs are kept and studied: I do security research, your request is data. Nothing leaves my boxes.
 - No comments. Mail <a href="mailto:0x0lor1n&#64;ghostbox&#46;cc"><svg class="ico" viewBox="0 0 512 512" fill="#e6c384" role="img" aria-label="Mail"><title>Mail</title><path d="M48 64C21.5 64 0 85.5.0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4.0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4.0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3.0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8.0L0 176z"/></svg></a>, XMPP <a href="xmpp:0x0lor1n@projectsegfau.lt"><svg class="ico" viewBox="0 0 24 24" fill="#1a8ccc" role="img" aria-label="XMPP"><title>XMPP</title><path d="m3.401 4.594 1.025.366 3.08.912c-.01.18-.016.361-.016.543 0 3.353 1.693 7.444 4.51 10.387 2.817-2.943 4.51-7.034 4.51-10.387 0-.182-.006-.363-.016-.543l3.08-.912 1.025-.366L24 3.276C23.854 8.978 19.146 14.9 13.502 18.17c1.302 1.028 2.778 1.81 4.388 2.215v.114l.004.001v.224a14.55 14.55 0 0 1-4.829-1.281A20.909 20.909 0 0 1 12 18.966c-.353.17-.708.329-1.065.477a14.55 14.55 0 0 1-4.829 1.281V20.5l.004-.001v-.113c1.61-.406 3.086-1.188 4.389-2.216C4.854 14.9.146 8.978 0 3.276l3.401 1.318Z"/></svg></a>, SimpleX <a href="https://smp19.simplex.im/a#wvUzZmVhCvcTlBJGbcepTPEWPWt0hRg3GzyhBPFfE00" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="#0095e7" role="img" aria-label="SimpleX"><title>SimpleX</title><path d="m16.1 0-4.026 4.025L8.125.076 6.113 2.09l3.95 3.947-3.975 3.977L2.14 6.066.109 8.096l3.948 3.947L0 16.1l1.975 1.972 4.056-4.056 3.95 3.947 2.029-2.027-3.95-3.95 3.975-3.972 3.951 3.949-4.025 4.023v.002L9.947 18l-4.023 4.025L7.896 24l4.026-4.025 3.95 3.949 2.013-2.014-3.951-3.95 4.027-4.024 3.95 3.949 2.013-2.012-3.95-3.95L24 7.899l-1.975-1.972L18 9.949 14.049 6l4.025-4.025z"/></svg></a>.
 
 ## License
