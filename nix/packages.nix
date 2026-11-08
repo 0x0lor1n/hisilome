@@ -366,6 +366,16 @@ pkgs: let
     '';
   };
 
+  # Also run by tests/e2e/test_state.py against a fake admin/stats.
+  listener-count = mkScript "listener-count" (
+    with pkgs; [
+      curl
+      coreutils
+      gnused
+      gawk
+    ]
+  );
+
   # 30 s of sine as Ogg/Opus. The console tests serve it in place of
   # /stream.opus through a Playwright route, so playback is checked without
   # icecast and without a binary asset in the repo.
@@ -382,6 +392,7 @@ pkgs: let
     export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1
     export PLAYWRIGHT_FIREFOX_EXECUTABLE=${pw-firefox}/bin/pw-firefox
     export E2E_TONE=${e2eTone}
+    export E2E_LISTENER_COUNT=${listener-count}/bin/listener-count
   '';
 
   # `nix run .#e2e [pytest args]`: the suite against the dev stack (E2E_BASE,
@@ -397,7 +408,7 @@ pkgs: let
 in {
   # The non-derivations are for nginx.nix and the dev stack; flake.nix filters them out.
   inherit zola nginxLocations nginxHttpConfig nginxLogFormat devNginxConf build-site dev-nginx site site-html-check;
-  inherit pw-firefox e2e e2eEnv pwPython;
+  inherit pw-firefox e2e e2eEnv pwPython listener-count;
 
   station-offline = pkgs.writeShellApplication {
     name = "station-offline";
@@ -442,15 +453,6 @@ in {
       ffmpeg
       coreutils
       findutils
-      gawk
-    ]
-  );
-
-  listener-count = mkScript "listener-count" (
-    with pkgs; [
-      curl
-      coreutils
-      gnused
       gawk
     ]
   );

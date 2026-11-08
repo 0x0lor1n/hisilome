@@ -43,9 +43,10 @@ fragments and the online/offline switch. Tests that touch
 and `listener-count` over the process-compose API (`E2E_PC`, default
 `:8081`, set in `process-compose.yaml`) and puts the real files back.
 Playback tests answer `/stream.opus` from a generated tone (`E2E_TONE`), so
-icecast is not involved. Firefox runs through the `pw-firefox` wrapper,
-which fixes the launch handshake and gives it a `libpulse` (see
-`nix/packages.nix`).
+icecast is not involved; `listener-count` is run `--once` against a fake
+`admin/stats` into a temp dir (`E2E_LISTENER_COUNT`). Firefox runs through
+the `pw-firefox` wrapper, which fixes the launch handshake and gives it a
+`libpulse` (see `nix/packages.nix`).
 Not a flake check and not a hook: it needs the running stack, run it by hand.
 Browsers are ~1 GB, hence the separate shell.
 
