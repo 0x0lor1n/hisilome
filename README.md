@@ -46,7 +46,11 @@ Playback tests answer `/stream.opus` from a generated tone (`E2E_TONE`), so
 icecast is not involved; `listener-count` is run `--once` against a fake
 `admin/stats` into a temp dir (`E2E_LISTENER_COUNT`). Firefox runs through
 the `pw-firefox` wrapper, which fixes the launch handshake and gives it a
-`libpulse` (see `nix/packages.nix`).
+`libpulse` (see `nix/packages.nix`). `test_http.py` needs no browser: fragment
+and asset headers, SSI kept off on fragments, the feed's origin, the stream
+proxy with `Icy-MetaData` stripped, and the `429` burst limit; the security
+headers only exist in the NixOS module, so their runtime test skips on the dev
+conf and the `add_header` inheritance rule is pinned against the nix source.
 Not a flake check and not a hook: it needs the running stack, run it by hand.
 Browsers are ~1 GB, hence the separate shell.
 
