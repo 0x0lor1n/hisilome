@@ -33,8 +33,9 @@ sticky: open `https://hisilo.me/<post>/` and every later click becomes
 `/<post>/#/logs/`. That is by design (the stream never restarts), not a bug;
 the shell's `<link rel="canonical">` always names the wrapped page without the
 query, so search engines and copy-paste land on `/<post>/`, never on `/listen/`.
-Links to other pages inside the site go through `$ link:` (the permalink bar
-on each post), which follows the door you came in from (clearnet, ygg, onion).
+The one clean URL on a post is the permalink icon in its meta line (next to
+the tags): it opens the post outside the console and follows the door you came
+in from (clearnet, ygg, onion).
 
 Hooks: `lefthook.yml` runs gitleaks and the formatters/linters for every file
 type in the repo on commit, `nix flake check` (build + vnu over the HTML) on

@@ -15,7 +15,11 @@
 href="<!--# echo var="shell_href" default="" -->{{ path | safe }}"<!--# if expr="$shell_href" --> target="_top"<!--# endif -->
 {%- endmacro href %}
 
-{% macro post_meta(page) %}
+{#- permalink=true (article pages only): the clean absolute URL as an icon.
+    Inside the shell the address bar reads <entry>/#/<page>/, so this is the
+    one clean URL on the page; it opens outside the console (no radio) and
+    right-click copies it. -#}
+{% macro post_meta(page, permalink=false) %}
 <div class="meta">
 {#- Worklogs grow as the build goes; a fixed date and reading time would lie. -#}
 {% if page.components.0 != "logs" %}
@@ -23,6 +27,7 @@ href="<!--# echo var="shell_href" default="" -->{{ path | safe }}"<!--# if expr=
 <span><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M464 256A208 208 0 1148 256a208 208 0 11416 0zM0 256a256 256 0 10512 0A256 256 0 100 256zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/></svg>~{{ page.reading_time }} min</span>
 {% endif %}
 <span><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M181.3 32.4c17.4 2.9 29.2 19.4 26.3 36.8L197.8 128h95.1l11.5-69.3c2.9-17.4 19.4-29.2 36.8-26.3s29.2 19.4 26.3 36.8L357.8 128H416c17.7.0 32 14.3 32 32s-14.3 32-32 32H347.1L325.8 320H384c17.7.0 32 14.3 32 32s-14.3 32-32 32H315.1l-11.5 69.3c-2.9 17.4-19.4 29.2-36.8 26.3s-29.2-19.4-26.3-36.8l9.8-58.7H155.1l-11.5 69.3c-2.9 17.4-19.4 29.2-36.8 26.3s-29.2-19.4-26.3-36.8L90.2 384H32c-17.7.0-32-14.3-32-32s14.3-32 32-32h68.9l21.3-128H64c-17.7.0-32-14.3-32-32s14.3-32 32-32h68.9l11.5-69.3c2.9-17.4 19.4-29.2 36.8-26.3zM187.1 192 165.8 320h95.1l21.3-128H187.1z"/></svg>{% for tag in page.taxonomies.tags %}<a href="{{ get_taxonomy_url(kind='tags', name=tag) | replace(from=config.base_url, to='') | safe }}">{{ tag }}</a>{% if not loop.last %} {% endif %}{% endfor %}</span>
+{% if permalink %}<a class="meta-permalink" href="{{ self::abs(url=page.permalink) }}" target="_blank" rel="noopener" title="Permalink: open outside the console (right-click to copy)"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h82.7L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3V192c0 17.7 14.3 32 32 32s32-14.3 32-32V32c0-17.7-14.3-32-32-32H320zM80 32C35.8 32 0 67.8 0 112v320c0 44.2 35.8 80 80 80h320c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v112c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16h112c17.7 0 32-14.3 32-32s-14.3-32-32-32H80z"/></svg></a>{% endif %}
 </div>
 {% endmacro post_meta %}
 
