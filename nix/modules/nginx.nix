@@ -52,6 +52,9 @@
       extraConfig = ''
         ssi on;
         error_page 404 /404.html;
+        # The slash redirect (/logs -> /logs/) would otherwise name the
+        # loopback port the onion maps away: Location: http://x.onion:8081/logs/
+        absolute_redirect off;
         ${logging entry}
         ${contentHeaders}
       '';
