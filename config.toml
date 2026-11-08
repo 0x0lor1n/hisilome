@@ -1,6 +1,8 @@
 base_url = "https://hisilo.me"
 title = "Hísilómë"
-description = "Self-taught web developer and Dev[Sec]Ops engineer with a passion for internet research. Dedicated Nix evangelist and cybersecurity enthusiast."
+# Channel text of rss.xml and the site's fallback meta description.
+description = "Writeups and worklogs by 0x0lor1n: hardware, NixOS, ZFS, firmware, a web page with no JavaScript, and a radio."
+author = "0x0lor1n"
 
 # d2 sources sit next to each post; the compiled svg is what the page inlines.
 ignored_content = ["*.d2"]
@@ -9,7 +11,7 @@ generate_feeds = true
 feed_filenames = ["rss.xml"]
 
 taxonomies = [
-    { name = "tags", rss = true },
+  { name = "tags" },
 ]
 
 [markdown]
