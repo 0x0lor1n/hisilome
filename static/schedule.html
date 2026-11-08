@@ -12,6 +12,9 @@
   <!-- The <details> that opens this is in the shell: inside a self-refreshing
        document it snaps shut on every reload. -->
   <body class="sc-body">
-    <!--#include virtual="/schedule-body.html" -->
+    <!-- No schedule yet (liquidsoap just started): an empty frame, not the
+         404 page spliced in with its own <title> and the shell's nav. -->
+    <!--#block name="schedule_stub" --><!--#endblock -->
+    <!--#include virtual="/schedule-body.html" stub="schedule_stub" -->
   </body>
 </html>

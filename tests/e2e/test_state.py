@@ -292,6 +292,23 @@ def test_schedule_fragment_spliced(page, base, radio_state):
     assert page.locator("title").count() == 1
 
 
+def test_schedule_absent_leaves_empty_list(page, base, radio_state):
+    """No `schedule.html` yet (liquidsoap just started) -> an empty frame.
+
+    Without a stub on the include nginx splices the whole 404 page -- a second
+    `<title>`, the shell's fonts and nav -- into the 15-row schedule frame.
+    """
+    radio_state.remove("schedule.html")
+    radio_state.fixture("refresh.html")
+    page.goto(base + "/schedule.html")
+    assert page.locator("title").count() == 1
+    assert page.title() == "Schedule"
+    expect(page.locator("ul.sc-list > li")).to_have_count(0)
+    # Nothing of the 404 page: no shell, no nav, no second stylesheet link.
+    expect(page.locator("nav, .cur, h1")).to_have_count(0)
+    assert page.locator("link[rel=stylesheet]").count() == 1
+
+
 def test_schedule_panel_in_console(page, base, radio_state):
     radio_state.fixture("console.html")
     radio_state.fixture("schedule.html")
