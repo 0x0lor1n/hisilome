@@ -133,6 +133,24 @@ pkgs: let
     limit_req_status  429;
   '';
 
+  # Studied at home, counted on the box (modules/metrics.nix). JSON so the
+  # exporter needs no regex; the fields are what both consumers read. `entry`
+  # is set per server block (clearnet/ygg/tor): one file, the door is a field.
+  nginxLogFormat = ''
+    log_format hisilome escape=json '{'
+      '"time":"$time_iso8601",'
+      '"entry":"$hisilome_entry",'
+      '"remote_addr":"$remote_addr",'
+      '"request":"$request",'
+      '"status":$status,'
+      '"body_bytes_sent":$body_bytes_sent,'
+      '"request_time":$request_time,'
+      '"http_referer":"$http_referer",'
+      '"http_user_agent":"$http_user_agent",'
+      '"server_protocol":"$server_protocol"'
+    '}';
+  '';
+
   # A shell load is ~10 requests at once, then a fragment every 10s per listener.
   pageLimit = "limit_req zone=pages burst=40 nodelay;";
 
@@ -249,7 +267,7 @@ pkgs: let
   };
 in {
   # The non-derivations are for nginx.nix and the dev stack; flake.nix filters them out.
-  inherit zola nginxLocations nginxHttpConfig devNginxConf build-site dev-nginx;
+  inherit zola nginxLocations nginxHttpConfig nginxLogFormat devNginxConf build-site dev-nginx;
 
   station-offline = pkgs.writeShellApplication {
     name = "station-offline";

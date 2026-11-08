@@ -8,6 +8,13 @@
   hisilome = import ../packages.nix pkgs;
   radioState = "${cfg.stateDir}/radio/state";
 
+  # One file for all doors; the entry is a field, set per server block.
+  logging = entry:
+    lib.optionalString cfg.accessLog.enable ''
+      set $hisilome_entry ${entry};
+      access_log ${cfg.accessLog.path} hisilome;
+    '';
+
   # 'unsafe-inline' on style-src only: liquidsoap's fragments and the tag cloud
   # use style attributes.
   contentHeaders = ''
@@ -32,6 +39,7 @@
   overlayHost = {
     addr,
     port,
+    entry,
   }:
     lib.nameValuePair "${cfg.domain}-${lib.replaceStrings ["[" "]" ":"] ["" "" "_"] addr}-${toString port}" {
       serverName = cfg.domain;
@@ -44,6 +52,7 @@
       extraConfig = ''
         ssi on;
         error_page 404 /404.html;
+        ${logging entry}
         ${contentHeaders}
       '';
       locations = hisilome.nginxLocations {
@@ -64,6 +73,9 @@ in {
       recommendedOptimisation = true;
 
       appendHttpConfig = hisilome.nginxHttpConfig;
+      # Before the server blocks: nginx rejects an access_log naming a format
+      # it has not read yet.
+      commonHttpConfig = lib.optionalString cfg.accessLog.enable hisilome.nginxLogFormat;
 
       virtualHosts =
         {
@@ -79,6 +91,7 @@ in {
             extraConfig = ''
               ssi on;
               error_page 404 /404.html;
+              ${logging "clearnet"}
               ${securityHeaders}
             '';
 

@@ -68,7 +68,14 @@ store; `null` keeps the loopback-only dev password), `queueRounds`,
 `overlayListen` (plain-HTTP `{addr, port}` listeners for a Yggdrasil address
 or an onion's local port: no TLS, no HSTS, firewall is yours),
 `onionLocation` (an `.onion` to advertise from the clearnet vhost via the
-`Onion-Location` header; serving it is `overlayListen` + `services.tor`).
+`Onion-Location` header; serving it is `overlayListen` + `services.tor`),
+`accessLog` (`enable`, `path`: one JSON file for every door, raw addresses,
+`entry` names the door - rotation and shipping are yours), `metrics`
+(`enable`, `listenAddress`, `nodePort` 9100, `nginxlogPort` 4040, `pages`:
+node_exporter with a textfile the listener poller writes - listeners per
+mount, peak, queue length, station up - and prometheus-nginxlog-exporter
+folding the log to status × method × page × entry; nothing path-shaped
+beyond `pages`, no address, leaves through metrics; the firewall is yours).
 
 The host side - certificate e-mail, firewall, persistence of the ACME state,
 `www.` alias - is the consumer's.

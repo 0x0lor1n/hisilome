@@ -15,6 +15,7 @@ in {
     ./setup.nix
     ./station.nix
     ./nginx.nix
+    ./metrics.nix
   ];
 
   options.services.hisilome = {
@@ -40,6 +41,12 @@ in {
           port = mkOption {
             type = types.port;
             default = 80;
+          };
+          entry = mkOption {
+            type = types.str;
+            default = "overlay";
+            example = "ygg";
+            description = "Door name in the access log and the metrics `entry` label.";
           };
         };
       });
@@ -107,6 +114,60 @@ in {
       type = types.int;
       default = 8;
       description = "Shuffled passes concatenated into the play queue.";
+    };
+
+    accessLog = {
+      enable = mkEnableOption "the JSON access log, one file for every door";
+      path = mkOption {
+        type = types.path;
+        default = "/var/log/nginx/hisilome.access.log";
+        description = ''
+          Raw addresses, user agents, referers: `metrics` reads it, the rest
+          is for the consumer to rotate, pull and study. Nothing in this
+          module masks or ships it.
+        '';
+      };
+    };
+
+    metrics = {
+      enable = mkEnableOption "Prometheus exporters for the station and the access log";
+      listenAddress = mkOption {
+        type = types.str;
+        example = "[200:1234::1]";
+        description = ''
+          The one address every exporter binds. Nothing is opened in the
+          firewall here; make it an overlay address and open the ports on that
+          interface.
+        '';
+      };
+      nodePort = mkOption {
+        type = types.port;
+        default = 9100;
+      };
+      nginxlogPort = mkOption {
+        type = types.port;
+        default = 4040;
+      };
+      pages = mkOption {
+        type = types.listOf types.str;
+        default = [
+          "/"
+          "/listen/"
+          "/stream.mp3"
+          "/stream.opus"
+          "/console.html"
+          "/rss.xml"
+          "/colophon/"
+          "/logs/"
+          "/series/"
+        ];
+        description = ''
+          Paths that get their own `page` label; every other request is
+          `other`. Keep it short: each entry is a time series per status and
+          method, and the label is the only path-shaped thing that leaves the
+          box via metrics.
+        '';
+      };
     };
   };
 

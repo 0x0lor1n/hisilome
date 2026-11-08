@@ -7,10 +7,8 @@
   oniguruma,
   installShellFiles,
 }:
-
 # nixpkgs' zola at 34ab990 minus the version test. 0.23 is Tera v2: no
 # {% import %}, macros:: or shortcodes. Drop once the templates are on components.
-
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zola";
   version = "0.22.1";
