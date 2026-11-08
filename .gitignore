@@ -22,3 +22,6 @@ content/**/[0-9]*.svg
 *.swp
 *~
 .DS_Store
+
+# pytest bytecode, tests/e2e
+__pycache__/

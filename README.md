@@ -28,6 +28,22 @@ Hooks: `lefthook.yml` runs gitleaks and the formatters/linters for every file
 type in the repo on commit, `nix flake check` (build + vnu over the HTML) on
 push. The tools are in the dev shell; `LEFTHOOK=0 git commit` skips them.
 
+## Browser tests
+
+```sh
+nix run .#e2e            # Chromium + Firefox against the stack on :8099 (E2E_BASE, loopback only)
+nix run .#e2e -- --engine chromium -k router   # pytest args pass through
+nix develop .#e2e        # the same + ruff, for writing tests
+```
+
+`tests/e2e/` pins what the shell's design relies on: the CSS router, the
+frames, the SSI fragments and the online/offline switch. Tests that touch
+`radio/state/` go through the `radio_state` fixture, which pauses liquidsoap
+and `listener-count` over the process-compose API (`E2E_PC`, default
+`:8081`, set in `process-compose.yaml`) and puts the real files back.
+Not a flake check and not a hook: it needs the running stack, run it by hand.
+Browsers are ~1 GB, hence the separate shell.
+
 ## Consuming the module
 
 ```nix

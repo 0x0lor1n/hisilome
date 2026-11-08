@@ -1,4 +1,7 @@
 version: "0.5"
+# REST API port; 8080 (the default) is taken on the dev host. tests/e2e use it
+# to pause liquidsoap while a fixture fragment is served (E2E_PC).
+port: 8081
 processes:
   # music/ is gitignored and rsynced in. Without this gate tag-music dies with a
   # bare "not a directory" and the dependency chain to liquidsoap wedges.

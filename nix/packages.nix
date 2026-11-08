@@ -322,9 +322,59 @@ pkgs: let
       s
     touch $out
   '';
+
+  # Browser tests (tests/e2e). Chromium + Firefox from nixpkgs' pinned
+  # playwright-driver; the python package must be the same minor, so both come
+  # from the same nixpkgs rather than pip.
+  pwBrowsers = pkgs.playwright-driver.browsers.override {withWebkit = false;};
+  pwPython = pkgs.python3.withPackages (p: [p.playwright p.pytest]);
+
+  # Playwright considers Firefox up once stderr says `Juggler listening to the
+  # pipe`, which Firefox prints through dump(). A host autoconfig (phoenix.cfg
+  # on this machine) turns dump() off system-wide, so the launch times out
+  # although Juggler works. Re-enable both prefs in the per-launch profile
+  # before the real binary starts; `firefox_user_prefs` cannot do it, it is
+  # applied after the handshake.
+  pw-firefox = pkgs.writeShellApplication {
+    name = "pw-firefox";
+    text = ''
+      profile=""
+      prev=""
+      for a in "$@"; do
+        [ "$prev" = "-profile" ] && profile=$a
+        prev=$a
+      done
+      if [ -n "$profile" ]; then
+        mkdir -p "$profile"
+        {
+          echo 'user_pref("browser.dom.window.dump.enabled", true);'
+          echo 'user_pref("devtools.console.stdout.chrome", true);'
+        } >> "$profile/user.js"
+      fi
+      exec ${pwBrowsers}/firefox-*/firefox/firefox "$@"
+    '';
+  };
+
+  e2eEnv = ''
+    export PLAYWRIGHT_BROWSERS_PATH=${pwBrowsers}
+    export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1
+    export PLAYWRIGHT_FIREFOX_EXECUTABLE=${pw-firefox}/bin/pw-firefox
+  '';
+
+  # `nix run .#e2e [pytest args]`: the suite against the dev stack (E2E_BASE,
+  # default :8099). Not a flake check: it needs the running stack.
+  e2e = pkgs.writeShellApplication {
+    name = "e2e";
+    runtimeInputs = [pwPython];
+    text = ''
+      ${e2eEnv}
+      exec pytest tests/e2e "$@"
+    '';
+  };
 in {
   # The non-derivations are for nginx.nix and the dev stack; flake.nix filters them out.
   inherit zola nginxLocations nginxHttpConfig nginxLogFormat devNginxConf build-site dev-nginx site site-html-check;
+  inherit pw-firefox e2e e2eEnv pwPython;
 
   station-offline = pkgs.writeShellApplication {
     name = "station-offline";

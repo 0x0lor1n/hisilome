@@ -62,6 +62,17 @@ pre-commit:
       glob: "templates/**/*.html"
       run: djlint --lint {staged_files}
 
+    # ruff lives in the e2e shell only; the default shell has no python.
+    - name: ruff
+      glob: "tests/**/*.py"
+      stage_fixed: true
+      run: |
+        if command -v ruff >/dev/null; then
+          ruff check --fix {staged_files} && ruff format {staged_files}
+        else
+          echo "ruff: not in PATH (nix develop .#e2e), python lint skipped" >&2
+        fi
+
 # Slow part: zola build + vnu over public/. Guards the push, not every commit.
 pre-push:
   jobs:
