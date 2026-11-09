@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import "macros.html" as macros %}
 
 {% block title %}Tags - {{ config.title }}{% endblock title %}
 {% block description %}{% endblock description %}
@@ -22,7 +21,7 @@
 {%- set n = term.pages | length %}
 {#- data-name feeds the two colour-fringe clones via content: attr(). It holds
     only the name, so the clones never duplicate the count superscript. -#}
-<a class="tag" {{ macros::href(path=term.path) }} style="--t: {{ (n - 1) / span }}"
+<a class="tag" {{ <href path={term.path} /> }} style="--t: {{ (n - 1) / span }}"
    data-name="{{ term.name }}"
    title="{{ n }} post{% if n != 1 %}s{% endif %}"
 >{{ term.name }}<span class="tag-n">{{ n }}</span></a>

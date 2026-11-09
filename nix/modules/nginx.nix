@@ -16,7 +16,7 @@
     '';
 
   # The site is built once against the clearnet base_url; each door echoes
-  # its own origin into the page (templates/macros.html `abs`). ssi_types so
+  # its own origin into the page (templates/components.html `abs`). ssi_types so
   # the feed gets it too.
   door = origin: ''
     set $hisilome_origin "${origin}";

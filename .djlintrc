@@ -2,5 +2,6 @@
   "profile": "jinja",
   "extension": "html",
   "ignore": "H023,H025,H030,J018,T028",
+  "custom_blocks": "component",
   "max_line_length": 200
 }

@@ -1,12 +1,11 @@
 {% extends "base.html" %}
-{% import "macros.html" as macros %}
 
 {% block content %}
 {# No h1: a post list inside the shell, not an article. validator.w3.org's
    outline heuristic flags this; CLI vnu does not. Ignored. #}
 <ul class="post-list">
 {% for page in section.pages %}
-{{ macros::post_item(page=page) }}
+{{ <post_item page={page} /> }}
 {% endfor %}
 </ul>
 {% endblock content %}

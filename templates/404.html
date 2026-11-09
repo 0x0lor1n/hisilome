@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import "macros.html" as macros %}
 
 {% block title %}404 - {{ config.title }}{% endblock title %}
 
@@ -9,5 +8,5 @@
 <h1>404</h1>
 <p class="permalink"><span class="cmd">$ cd</span> <code>.<!--# echo var="request_uri" default="/nope/" --></code></p>
 <p>cd: no such file or directory</p>
-<p><a {{ macros::href(path="/") }}>&larr; back to all posts</a></p>
+<p><a {{ <href path="/" /> }}>&larr; back to all posts</a></p>
 {% endblock content %}

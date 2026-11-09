@@ -1,4 +1,3 @@
-{% import "macros.html" as m -%}
 <?xml version="1.0" encoding="UTF-8"?>
 {#- Summary feed: the front-matter description, not the body. The body carries
     inline d2 SVGs and dialogue sprites that readers mangle (260 KB for 3 items
@@ -11,20 +10,20 @@
   <channel>
     <title>{{ config.title }}
       {%- if term %} - {{ term.name }}
-      {%- elif section.title %} - {{ section.title }}
+      {%- elif section and section.title %} - {{ section.title }}
       {%- endif -%}
     </title>
     <link>
       {%- if section -%}
-        {{ m::abs(url=section.permalink) }}
+        {{ <abs url={section.permalink} /> }}
       {%- else -%}
-        {{ m::abs(url=config.base_url ~ "/") }}
+        {{ <abs url={config.base_url ~ "/"} /> }}
       {%- endif -%}
     </link>
     <description>{{ config.description }}</description>
     <generator>Zola</generator>
     <language>{{ lang }}</language>
-    <atom:link href="{{ m::abs(url=feed_url) }}" rel="self" type="application/rss+xml"/>
+    <atom:link href="{{ <abs url={feed_url} /> }}" rel="self" type="application/rss+xml"/>
     {% if last_updated is defined %}<lastBuildDate>{{ last_updated | date(format="%a, %d %b %Y %H:%M:%S %z") }}</lastBuildDate>{% endif %}
     {%- for page in pages %}
     {#- Archive posts only: a log sits under /logs/ (two ancestors), a post sits at the root (one). -#}
@@ -33,14 +32,14 @@
       <title>{{ page.title }}</title>
       <pubDate>{{ page.date | date(format="%a, %d %b %Y %H:%M:%S %z") }}</pubDate>
       <author>{{ config.author }}</author>
-      <link>{{ m::abs(url=page.permalink) }}</link>
+      <link>{{ <abs url={page.permalink} /> }}</link>
       <guid isPermaLink="false">{{ page.permalink | escape_xml | safe }}</guid>
       {%- if page.taxonomies.tags %}
       {%- for tag in page.taxonomies.tags %}
       <category>{{ tag }}</category>
       {%- endfor %}
       {%- endif %}
-      <description>{{ page.description | default(value=page.title) }} &#8212; {{ m::abs(url=page.permalink) }}</description>
+      <description>{{ page.description | default(value=page.title) }} &#8212; {{ <abs url={page.permalink} /> }}</description>
     </item>
     {%- endif %}
     {%- endfor %}

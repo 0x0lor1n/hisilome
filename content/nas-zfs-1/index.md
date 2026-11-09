@@ -21,7 +21,7 @@ My storage was growing up too: USB sticks, external drives, HDDs, SSDs, sometime
 
 Disclaimer: why I don't use cloud storage: clouds lost my trust long time ago. Personal experience: Meta (whatsapp + facebook) was posting pictures from *my* archives to their platforms without my approval. Another example: some friends had an issue with Apple's cloud - pictures they deleted were showing up in albums after 5+ years.
 
-{% dialogue() %}
+{% <dialogue> %}
 KRITON. So the cloud posted your photos.
 
 0x0lor1n. Without asking.
@@ -33,7 +33,7 @@ KRITON. And your fix is a box in your apartment.
 KRITON. You called the last one a newbie mistake.
 
 0x0lor1n. I opened that one too.
-{% end %}
+{% </dialogue> %}
 
 When it stopped being recognized I tried to open the case, calmly. Took me like an hour and a half, bent two steel pry bars and cut a finger. Then I looked in the web for a guy who by concept of [simultaneous discovery](https://en.wikipedia.org/wiki/Multiple_discovery) solved this problem. Found one, a guy who filmed the process of opening similar Porsche Design case. Turns out: there is a latch invisible from outside you need to slide out.
 
@@ -122,7 +122,7 @@ With M2 being used for 10Gbit/s channel and all the SATA drives reserved for the
 
 - Fast data: we take main PCIe x16 and put an NVMe expansion card with an onboard switch on it. I was choosing between ASM2824 and LRNV9547L-4L controllers. Picked ASM2824 for lower power consumption. It will distribute the x8 lanes over 4 NVMe drives, so with a PCIe switch it does not matter if your motherboard supports bifurcation or not. Original idea taken from this setup, though they just used a splitter without bifurcation.
 
-{% dialogue() %}
+{% <dialogue> %}
 KRITON. You said the M.2 slot was for the OS.
 
 0x0lor1n. It was.
@@ -133,7 +133,7 @@ KRITON. And now the network card sits there.
 has its own connector for SATA power from the supply. Sec, I need to write that down.
 
 KRITON. So where does the OS go?
-{% end %}
+{% </dialogue> %}
 
 - OS resides on PCIe x1. A ~~btrfs~~ zfs mirror of two 256 GB NVMe drives is sitting on top of a PCIe x1 to dual NVMe splitter card (ASM1182e). ASM1182e is a PCIe 2.0 switch, so ~500 MB/s for both drives together, ~250 MB/s each under simultaneous load. More than enough for the OS.
 
@@ -144,7 +144,7 @@ The picture came together:
 - PCIe x1 slot: ~~btrfs~~ ZFS mirror of 2 × 256 GB for the OS through a PCIe x1 to 2 × M.2 splitter card.
 - M.2 slot: NIC through an M.2-to-SFP+ adapter.
 
-{{ d2(name="01-topology", alt="PCIe topology of the NAS. From the i5-6600T: the x16 slot (x8 used, ~7.9 GB/s) feeds an ASM2824 switch with 4 × x4 down to the fast-data NVMe mirror; DMI 3.0 x4 (~3.9 GB/s) feeds the B250 chipset. From the chipset: the M.2 slot links at PCIe 2.0 x4 (~2 GB/s) to the Intel 82599 SFP+ adapter; the x1 slot links at 2.0 (~500 MB/s) to an ASM1182e splitter, the single point of failure, holding the OS mirror; six SATA ports hold 3 × IronWolf raidz1, 2 × Barracuda stripe for the copy, one port free.") }}
+{{ <d2 name="01-topology" alt="PCIe topology of the NAS. From the i5-6600T: the x16 slot (x8 used, ~7.9 GB/s) feeds an ASM2824 switch with 4 × x4 down to the fast-data NVMe mirror; DMI 3.0 x4 (~3.9 GB/s) feeds the B250 chipset. From the chipset: the M.2 slot links at PCIe 2.0 x4 (~2 GB/s) to the Intel 82599 SFP+ adapter; the x1 slot links at 2.0 (~500 MB/s) to an ASM1182e splitter, the single point of failure, holding the OS mirror; six SATA ports hold 3 × IronWolf raidz1, 2 × Barracuda stripe for the copy, one port free." /> }}
 
 ## Summary
 

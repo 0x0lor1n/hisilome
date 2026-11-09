@@ -44,10 +44,17 @@ pkgs: let
         layout=$(sed -n '1,3s/^# layout: *//p' "$f" | head -1)
         d2 --layout "''${layout:-elk}" --theme 200 --pad 10 --scale 1 --no-xml-tag "$f" "''${f%.d2}.svg"
         # d2 paints stroke/fill onto <image>, invalid there; pixel-identical without.
-        sed -i -E 's/(<image[^>]*)\s(stroke|fill)="[^"]*"/\1/g; s/(<image[^>]*)\s(stroke|fill)="[^"]*"/\1/g' "''${f%.d2}.svg"
+        # No blank lines: the <d2> component inlines the svg before markdown runs,
+        # and a blank line ends the CommonMark HTML block mid-<figure>.
+        sed -i -E 's/(<image[^>]*)\s(stroke|fill)="[^"]*"/\1/g; s/(<image[^>]*)\s(stroke|fill)="[^"]*"/\1/g; /^$/d' "''${f%.d2}.svg"
       done
       # Drafts in unless SITE_DRAFTS=0; the site derivation sets 0.
       if [ "''${SITE_DRAFTS:-1}" != 0 ]; then set -- --drafts "$@"; fi
+      # zola 0.23 builds its load_data http client eagerly (load_data.rs:246) and
+      # panics without a CA store. The nix sandbox has none and stdenv points
+      # SSL_CERT_FILE at /no-cert-file.crt, so test the file, not the variable.
+      # We only load local svgs; the client is never used.
+      [ -r "''${SSL_CERT_FILE:-}" ] || export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
       zola build "$@"
 
       out=public prev=
@@ -127,7 +134,7 @@ pkgs: let
     }
 
     # A link inside a shell frame points at the shell's own URL plus the page
-    # as a fragment (templates/macros.html `href`): :target flips the frame,
+    # as a fragment (templates/components.html `href`): :target flips the frame,
     # nothing reloads. The shell URL is the frame's Referer (same origin, so
     # the policy sends the path; fragments never travel in Referer). Empty
     # outside a frame, or when the frame has no referrer: a plain link.

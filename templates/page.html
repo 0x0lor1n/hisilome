@@ -1,14 +1,13 @@
 {% extends "base.html" %}
-{% import "macros.html" as macros %}
 
 {% block title %}{{ page.title }} - {{ config.title }}{% endblock title %}
 {% block description %}<meta name="description" content="{{ page.description }}">{% endblock description %}
 
 {% block content %}
 <h1>{{ page.title }}</h1>
-{{ macros::post_meta(page=page, permalink=true) }}
-{{ macros::series_strip(page=page) }}
-{{ macros::body(html=page.content) }}
+{{ <post_meta page={page} permalink={true} /> }}
+{{ <series_strip page={page} /> }}
+{{ <body html={page.content} /> }}
 
-<p><a {{ macros::href(path="/") }}>&larr; back to all posts</a></p>
+<p><a {{ <href path="/" /> }}>&larr; back to all posts</a></p>
 {% endblock content %}

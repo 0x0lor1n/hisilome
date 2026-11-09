@@ -1,4 +1,3 @@
-{% import "macros.html" as m %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +22,7 @@
 {#- Outside the markers: the SSI echo is a comment, and build-site drops those
     from meta.html. Scrapers never get the shell anyway (no Sec-Fetch-Dest).
     og:url follows the door; canonical stays the clearnet: identity vs transport. -#}
-{% if current_url %}<meta property="og:url" content="{{ m::abs(url=current_url) }}">{% endif %}
+{% if current_url %}<meta property="og:url" content="{{ <abs url={current_url} /> }}">{% endif %}
 {% endblock head_meta -%}
 <link rel="stylesheet" href="/style.css?v={{ get_hash(path="style.css") | truncate(length=12, end="") }}">
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
@@ -38,8 +37,8 @@
 <body<!--# if expr="$http_sec_fetch_dest = iframe" --> class="framed"<!--# endif -->>
 <!--# if expr="$http_sec_fetch_dest != iframe" -->
 <div class="frame">
-{{ m::shell_topbar() }}
-{{ m::shell_console() }}
+{{ <shell_topbar /> }}
+{{ <shell_console /> }}
 <!--# endif -->
 
 <div class="layout">
@@ -49,7 +48,7 @@
 </div>
 
 <!--# if expr="$http_sec_fetch_dest != iframe" -->
-{{ m::shell_footer() }}
+{{ <shell_footer /> }}
 </div>
 <!--# endif -->
 </body>

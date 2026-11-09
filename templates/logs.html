@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import "macros.html" as macros %}
 
 {% block title %}Logs - {{ config.title }}{% endblock title %}
 {% block description %}<meta name="description" content="Worklogs: parts lists, measurements, command dumps. The raw material between writeups.">{% endblock description %}
@@ -9,7 +8,7 @@
 <p class="lead">Worklogs: parts lists, numbers, command dumps. What a writeup is later distilled from.</p>
 <ul class="post-list">
 {% for page in section.pages %}
-{{ macros::post_item(page=page) }}
+{{ <post_item page={page} /> }}
 {% endfor %}
 </ul>
 {% endblock content %}

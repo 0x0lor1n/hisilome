@@ -1,115 +1,108 @@
-{% macro abs(url) %}
+{% component abs(url: string, @config) %}
 {#- An absolute URL for the network the reader came in on. The build knows
     one base_url; nginx knows the door ($hisilome_origin, set per server
     block), so the origin is echoed at serve time. default= covers a
     listener without the variable and the vnu check (SSI cut). -#}
 <!--# echo var="hisilome_origin" default="{{ config.base_url | safe }}" -->{{ url | replace(from=config.base_url, to="") | safe }}
-{%- endmacro abs %}
+{%- endcomponent abs %}
 
 {#- An internal link that survives the radio shell. Inside a shell frame nginx
     sets $shell_href to the shell's URL plus "#" (nix/packages.nix map), so
     the href becomes `<shell>#/path/` with target=_top: the shell's :target
     flips to that page's frame, nothing reloads, <audio> lives. Elsewhere
     $shell_href is empty and this is a plain link. -#}
-{% macro href(path) -%}
+{% component href(path: string) -%}
 href="<!--# echo var="shell_href" default="" -->{{ path | safe }}"<!--# if expr="$shell_href" --> target="_top"<!--# endif -->
-{%- endmacro href %}
+{%- endcomponent href %}
 
-{#- The same for rendered markdown, where no macro can run: every path that
+{#- The same for rendered markdown, where no component can run: every path that
     has a frame in the shell (the route list of listen.html, kept in step).
     Without this a content link navigates the frame it sits in, and that frame
     shows the wrong page for the rest of the session (colophon -> "how" ->
     tags -> colophon). -#}
-{% macro body(html) -%}
-{%- set_global routes = ["/", "/logs/", "/series/", "/tags/", "/colophon/", "/ls/"] %}
+{% component body(html: string) -%}
 {%- set writeups = get_section(path="_index.md") %}
 {%- set logs = get_section(path="logs/_index.md") %}
 {%- set series = get_section(path="series/_index.md") %}
-{%- for p in writeups.pages | concat(with=logs.pages) | concat(with=series.pages) %}
-  {%- set_global routes = routes | concat(with=[p.path]) %}
-{%- endfor %}
 {%- set tags = get_taxonomy(kind="tags") %}
-{%- for t in tags.items %}
-  {%- set_global routes = routes | concat(with=[t.path]) %}
-{%- endfor %}
-{%- set_global out = html %}
+{%- set routes = ["/", "/logs/", "/series/", "/tags/", "/colophon/", "/ls/",
+    ...[p.path for p in [...writeups.pages, ...logs.pages, ...series.pages]],
+    ...[t.path for t in tags.items]] %}
+{%- set out = html %}
 {%- for r in routes %}
   {%- set_global out = out | replace(from='<a href="' ~ r ~ '"', to='<a <!--# if expr="$shell_href" -->target="_top" <!--# endif -->href="<!--# echo var="shell_href" default="" -->' ~ r ~ '"') %}
 {%- endfor %}
 {{ out | safe }}
-{%- endmacro body %}
+{%- endcomponent body %}
 
 {#- permalink=true (article pages only): the clean absolute URL as an icon.
     Inside the shell the address bar reads <entry>/#/<page>/, so this is the
     one clean URL on the page; it opens outside the console (no radio) and
     right-click copies it. -#}
-{% macro post_meta(page, permalink=false) %}
+{% component post_meta(page: map, permalink: bool = false, @config) %}
 <div class="meta">
 {#- Worklogs grow as the build goes; a fixed date and reading time would lie. -#}
-{% if page.components.0 != "logs" %}
+{% if page.components[0] != "logs" %}
 <span><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M152 24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H64C28.7 64 0 92.7.0 128v16 48V448c0 35.3 28.7 64 64 64H384c35.3.0 64-28.7 64-64V192 144 128c0-35.3-28.7-64-64-64H344V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H152V24zM48 192h80v56H48V192zm0 104h80v64H48V296zm128 0h96v64H176V296zm144 0h80v64H320V296zm80-48H320V192h80v56zm0 160v40c0 8.8-7.2 16-16 16H320V408h80zm-128 0v56H176V408h96zm-144 0v56H64c-8.8.0-16-7.2-16-16V408h80zM272 248H176V192h96v56z"/></svg>{{ page.date | date(format="%b %e, %Y") }}</span>
 <span><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M464 256A208 208 0 1148 256a208 208 0 11416 0zM0 256a256 256 0 10512 0A256 256 0 100 256zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/></svg>~{{ page.reading_time }} min</span>
 {% endif %}
-<span><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M181.3 32.4c17.4 2.9 29.2 19.4 26.3 36.8L197.8 128h95.1l11.5-69.3c2.9-17.4 19.4-29.2 36.8-26.3s29.2 19.4 26.3 36.8L357.8 128H416c17.7.0 32 14.3 32 32s-14.3 32-32 32H347.1L325.8 320H384c17.7.0 32 14.3 32 32s-14.3 32-32 32H315.1l-11.5 69.3c-2.9 17.4-19.4 29.2-36.8 26.3s-29.2-19.4-26.3-36.8l9.8-58.7H155.1l-11.5 69.3c-2.9 17.4-19.4 29.2-36.8 26.3s-29.2-19.4-26.3-36.8L90.2 384H32c-17.7.0-32-14.3-32-32s14.3-32 32-32h68.9l21.3-128H64c-17.7.0-32-14.3-32-32s14.3-32 32-32h68.9l11.5-69.3c2.9-17.4 19.4-29.2 36.8-26.3zM187.1 192 165.8 320h95.1l21.3-128H187.1z"/></svg>{% for tag in page.taxonomies.tags %}<a {{ self::href(path=get_taxonomy_url(kind='tags', name=tag) | replace(from=config.base_url, to='')) }}>{{ tag }}</a>{% if not loop.last %} {% endif %}{% endfor %}</span>
-{% if permalink %}<a class="meta-permalink" href="{{ self::abs(url=page.permalink) }}" target="_blank" rel="noopener" title="Permalink: open outside the console (right-click to copy)"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h82.7L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3V192c0 17.7 14.3 32 32 32s32-14.3 32-32V32c0-17.7-14.3-32-32-32H320zM80 32C35.8 32 0 67.8 0 112v320c0 44.2 35.8 80 80 80h320c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v112c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16h112c17.7 0 32-14.3 32-32s-14.3-32-32-32H80z"/></svg></a>{% endif %}
+<span><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M181.3 32.4c17.4 2.9 29.2 19.4 26.3 36.8L197.8 128h95.1l11.5-69.3c2.9-17.4 19.4-29.2 36.8-26.3s29.2 19.4 26.3 36.8L357.8 128H416c17.7.0 32 14.3 32 32s-14.3 32-32 32H347.1L325.8 320H384c17.7.0 32 14.3 32 32s-14.3 32-32 32H315.1l-11.5 69.3c-2.9 17.4-19.4 29.2-36.8 26.3s-29.2-19.4-26.3-36.8l9.8-58.7H155.1l-11.5 69.3c-2.9 17.4-19.4 29.2-36.8 26.3s-29.2-19.4-26.3-36.8L90.2 384H32c-17.7.0-32-14.3-32-32s14.3-32 32-32h68.9l21.3-128H64c-17.7.0-32-14.3-32-32s14.3-32 32-32h68.9l11.5-69.3c2.9-17.4 19.4-29.2 36.8-26.3zM187.1 192 165.8 320h95.1l21.3-128H187.1z"/></svg>{% for tag in page.taxonomies.tags %}<a {{ <href path={get_taxonomy_url(kind="tags", term=tag) | replace(from=config.base_url, to="")} /> }}>{{ tag }}</a>{% if not loop.last %} {% endif %}{% endfor %}</span>
+{% if permalink %}<a class="meta-permalink" href="{{ <abs url={page.permalink} /> }}" target="_blank" rel="noopener" title="Permalink: open outside the console (right-click to copy)"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h82.7L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3V192c0 17.7 14.3 32 32 32s32-14.3 32-32V32c0-17.7-14.3-32-32-32H320zM80 32C35.8 32 0 67.8 0 112v320c0 44.2 35.8 80 80 80h320c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v112c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16h112c17.7 0 32-14.3 32-32s-14.3-32-32-32H80z"/></svg></a>{% endif %}
 </div>
-{% endmacro post_meta %}
+{% endcomponent post_meta %}
 
 {#- One entry of a post list. kind is shown as a prefix on mixed lists (series
     pages) where a writeup and a worklog sit next to each other. -#}
-{% macro post_item(page, kind=false, summary=true) %}
+{% component post_item(page: map, kind: bool = false, summary: bool = true) %}
 <li>
-<h3>{% if kind %}<span class="kind">{% if page.components.0 == "logs" %}worklog{% else %}writeup{% endif %}</span> {% endif %}<a class="post-title" {{ self::href(path=page.path) }} data-name="{{ page.title }}">{{ page.title }}</a></h3>
-{{ self::post_meta(page=page) }}
+<h3>{% if kind %}<span class="kind">{% if page.components[0] == "logs" %}worklog{% else %}writeup{% endif %}</span> {% endif %}<a class="post-title" {{ <href path={page.path} /> }} data-name="{{ page.title }}">{{ page.title }}</a></h3>
+{{ <post_meta page /> }}
 {% if summary and page.description %}<p class="summary">{{ page.description }}</p>{% endif %}
 </li>
-{% endmacro post_item %}
+{% endcomponent post_item %}
 
-{#- mode="list" or the prev/next strip (mode="nav", needs current). Tera
-    macros cannot return arrays, so both live here. -#}
-{% macro series_pages(slug, mode, current="") %}
+{#- Both read the same sorted list; a component cannot return an array, so
+    the one-line comprehension is repeated rather than shared. -#}
+{% component series_list(slug: string) %}
 {%- set writeups = get_section(path="_index.md") %}
 {%- set logs = get_section(path="logs/_index.md") %}
-{%- set_global parts = [] %}
-{%- for p in writeups.pages | concat(with=logs.pages) %}
-  {%- if p.extra.series is defined and p.extra.series == slug %}
-    {%- set_global parts = parts | concat(with=[p]) %}
-  {%- endif %}
-{%- endfor %}
-{%- set parts = parts | sort(attribute="extra.part") %}
-{%- if mode == "list" %}
+{%- set parts = [p for p in [...writeups.pages, ...logs.pages] if p.extra.series is defined and p.extra.series == slug] | sort(attribute="extra.part") %}
 <ul class="post-list">
 {%- for p in parts %}
-{{ self::post_item(page=p, kind=true) }}
+{{ <post_item page={p} kind={true} /> }}
 {%- endfor %}
 </ul>
-{%- else %}
-{%- set total = parts | length %}
-{%- set_global prev = "" %}{%- set_global next = "" %}
+{% endcomponent series_list %}
+
+{#- The prev/next strip for the page at `current`. -#}
+{% component series_nav(slug: string, current: string) %}
+{%- set writeups = get_section(path="_index.md") %}
+{%- set logs = get_section(path="logs/_index.md") %}
+{%- set parts = [p for p in [...writeups.pages, ...logs.pages] if p.extra.series is defined and p.extra.series == slug] | sort(attribute="extra.part") %}
+{%- set prev = "" %}{%- set next = "" %}
 {%- for p in parts %}
   {%- if p.path == current %}
-    {%- if not loop.first %}{%- set_global prev = parts | nth(n=loop.index0 - 1) %}{%- endif %}
-    {%- if not loop.last %}{%- set_global next = parts | nth(n=loop.index0 + 1) %}{%- endif %}
+    {%- if not loop.first %}{%- set_global prev = parts[loop.index0 - 1] %}{%- endif %}
+    {%- if not loop.last %}{%- set_global next = parts[loop.index0 + 1] %}{%- endif %}
   {%- endif %}
 {%- endfor %}
-{%- if prev %}<a {{ self::href(path=prev.path) }} title="{{ prev.title }}">&larr; #{{ prev.extra.part }}</a>{% else %}<span class="off">&larr;</span>{% endif %}
-{%- if next %}<a {{ self::href(path=next.path) }} title="{{ next.title }}">#{{ next.extra.part }} &rarr;</a>{% else %}<span class="off">&rarr;</span>{% endif %}
-{%- endif %}
-{% endmacro series_pages %}
+{%- if prev %}<a {{ <href path={prev.path} /> }} title="{{ prev.title }}">&larr; #{{ prev.extra.part }}</a>{% else %}<span class="off">&larr;</span>{% endif %}
+{%- if next %}<a {{ <href path={next.path} /> }} title="{{ next.title }}">#{{ next.extra.part }} &rarr;</a>{% else %}<span class="off">&rarr;</span>{% endif %}
+{% endcomponent series_nav %}
 
 {#- "Part N of M in <series>" strip under an article title. Silent when the
     page has no series. -#}
-{% macro series_strip(page) %}
+{% component series_strip(page: map) %}
 {%- if page.extra.series is defined %}
 {%- set s = get_page(path="series/" ~ page.extra.series ~ ".md") %}
-<p class="series-strip"><span class="cmd">$ series:</span> <a {{ self::href(path=s.path) }}>{{ s.title }}</a> <span class="part">#{{ page.extra.part }}</span> {{ self::series_pages(slug=page.extra.series, mode="nav", current=page.path) }}</p>
+<p class="series-strip"><span class="cmd">$ series:</span> <a {{ <href path={s.path} /> }}>{{ s.title }}</a> <span class="part">#{{ page.extra.part }}</span> {{ <series_nav slug={page.extra.series} current={page.path} /> }}</p>
 {%- endif %}
-{% endmacro series_strip %}
+{% endcomponent series_strip %}
 
 {#- ext=true renders links for the radio shell's OUTER document, where a plain
     navigation would replace the shell and stop the stream: site links become
     fragments that :target a frame in the stack (see listen.html). -#}
-{% macro shell_topbar(ext=false) %}
+{% component shell_topbar(ext: bool = false, @config) %}
 <header class="topbar">
 <span class="ident">0x0lor1n@<a href="{% if ext %}#{% endif %}/" class="prompt">{{ config.title }}</a></span>
 <span class="cmd" aria-hidden="true">$</span>
@@ -132,9 +125,9 @@ href="<!--# echo var="shell_href" default="" -->{{ path | safe }}"<!--# if expr=
 <a href="/rss.xml"{% if ext %} target="_blank" rel="noopener"{% endif %} title="RSS" aria-label="RSS"><svg viewBox="0 0 448 512" aria-hidden="true"><path d="M64 32C28.7 32 0 60.7.0 96V416c0 35.3 28.7 64 64 64H384c35.3.0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM96 136c0-13.3 10.7-24 24-24 137 0 248 111 248 248 0 13.3-10.7 24-24 24s-24-10.7-24-24c0-110.5-89.5-2e2-2e2-2e2-13.3.0-24-10.7-24-24zm0 96c0-13.3 10.7-24 24-24 83.9.0 152 68.1 152 152 0 13.3-10.7 24-24 24s-24-10.7-24-24c0-57.4-46.6-104-104-104-13.3.0-24-10.7-24-24zm0 120a32 32 0 1164 0 32 32 0 11-64 0z"/></svg></a>
 </p>
 </header>
-{% endmacro shell_topbar %}
+{% endcomponent shell_topbar %}
 
-{% macro shell_console(ext=false) %}
+{% component shell_console(ext: bool = false) %}
 <section class="console" aria-label="Radio player">
 <div class="console-head">
 {#- A checkbox, not <details>: closing a <details> drops <audio> and stops playback. -#}
@@ -155,12 +148,40 @@ href="<!--# echo var="shell_href" default="" -->{{ path | safe }}"<!--# if expr=
 <details class="sc-toggle" name="shell"><summary><span class="rc-br" aria-hidden="true">][</span> files: <span class="sc-word">list</span> <span class="rc-br" aria-hidden="true">]</span></summary><div class="sc-panel"><iframe class="sc-frame" src="/schedule.html" title="Schedule"></iframe></div></details>
 </div>
 </section>
-{% endmacro shell_console %}
+{% endcomponent shell_console %}
 
-{% macro shell_footer(ext=false) %}
+{% component shell_footer(ext: bool = false) %}
 <footer class="lain-tribute{% if ext %} shell-footer{% endif %}">
 <p class="lain-tribute-text">▓ In memory of <a href="https://github.com/barrucadu/lainonlife"{% if ext %} target="_blank" rel="noopener"{% endif %}>lainon.life</a> - online radio for lainons, 2017–2023 ▓</p>
 <p class="lain-tribute-quote">"No matter where you go, everyone's connected."</p>
 </footer>
-{% endmacro shell_footer %}
+{% endcomponent shell_footer %}
 
+{#- Content components (were shortcodes). `@page` is the page whose markdown
+    is being rendered; a component sees nothing else. -#}
+{#- Inlined so the text is selectable; build-site compiles the .d2 next to index.md. -#}
+{% component d2(name: string, alt: string, @page) %}
+<figure class="d2" role="img" aria-label="{{ alt }}">
+{{ load_data(path=page.colocated_path ~ name ~ ".svg") | safe }}
+</figure>
+{% endcomponent d2 %}
+
+{#- One reply per paragraph, "KRITON. ..." / "0x0lor1n. ..."; a paragraph
+    starting with neither is a stage direction. -#}
+{% component dialogue() %}
+<div class="dialogue">
+{%- for para in body | trim | split(pat="\n\n") %}
+{%- set line = para | trim | replace(from="\n", to=" ") %}
+{%- if line is starting_with(pat="KRITON.") %}
+{%- set who = "k" %}{%- set name = "KRITON." %}{%- set icon = "kriton" %}
+{%- set text = line | trim_start(pat="KRITON.") | trim %}
+{%- elif line is starting_with(pat="0x0lor1n.") %}
+{%- set who = "o" %}{%- set name = "0x0lor1n." %}{%- set icon = "olorin" %}
+{%- set text = line | trim_start(pat="0x0lor1n.") | trim %}
+{%- else %}
+{%- set who = "x" %}{%- set name = "" %}{%- set icon = "" %}{%- set text = line %}
+{%- endif %}
+<p class="{{ who }}">{%- if icon %}<img src="/img/{{ icon }}.png" width="48" height="48" alt="" loading="lazy">{% endif %}<span><b>{{ name }}</b> {{ text | markdown(inline=true) | safe }}</span></p>
+{%- endfor %}
+</div>
+{% endcomponent dialogue %}

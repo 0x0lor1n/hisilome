@@ -1,4 +1,4 @@
-"""The radio console in the shell (templates/macros.html `shell_console`).
+"""The radio console in the shell (templates/components.html `shell_console`).
 
 The whole point of the shell is that the one <audio> lives outside the route
 frames, so it keeps playing across navigation and across the fold. The fold
