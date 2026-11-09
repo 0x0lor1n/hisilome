@@ -177,7 +177,7 @@ def write_console() =
 
     fill =
       if du > 0. then
-        '<span class="rc-fill" style="--dur:' ^ string_of(du) ^ 's;--elapsed:-' ^ string_of(el) ^ 's"></span>'
+        '<span class="rc-fill" style="--dur:' ^ string(du) ^ 's;--elapsed:-' ^ string(el) ^ 's"></span>'
       else
         ''
       end
@@ -245,7 +245,7 @@ def mins_word(t) =
   else
     # nested quotes inside a #{...} interpolation do not parse
     plural = if m == 1 then "" else "s" end
-    string_of(m) ^ " min" ^ plural
+    string(m) ^ " min" ^ plural
   end
 end
 
