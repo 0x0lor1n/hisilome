@@ -967,7 +967,12 @@ body.framed {
   color: var(--meta);
   cursor: pointer;
   user-select: none;
-  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), color 120ms;
+  /* same clock as the schedule panel (.sc-panel): the fold is one motion */
+  transition:
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    top 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    margin-top 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 120ms;
 }
 
 /* Drawn, not a glyph: Iosevka's ▾ is a 6px speck. Two borders of a square,
@@ -1004,7 +1009,34 @@ body.framed {
 }
 
 /* The frame switches to its one-line layout on its own height; the shell
-   only sets that. Hidden, not removed: <audio> keeps playing at display:none. */
+   only sets that. Hidden, not removed: <audio> keeps playing at display:none.
+
+   One motion with the schedule panel: the controls fade and slide 14px on the
+   same 320ms expo-out, display joins through allow-discrete, @starting-style
+   is the unfold's from-state. The live frame and the head's padding ride the
+   same clock, so the console shrinks as the controls go. */
+.console-head {
+  transition: padding 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.console-live {
+  transition: height 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.console-play,
+.console-meta {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    display 320ms allow-discrete;
+}
+@starting-style {
+  .console:not(:has(.console-fold:checked)) .console-play,
+  .console:not(:has(.console-fold:checked)) .console-meta {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
 .console:has(.console-fold:checked) .console-head {
   padding: 0.3rem 0.75rem 0.3rem 2.4rem;
 }
@@ -1015,12 +1047,31 @@ body.framed {
 .console:has(.console-fold:checked) .console-play,
 .console:has(.console-fold:checked) .console-meta {
   display: none;
+  opacity: 0;
+  transform: translateY(-14px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console-head,
+  .console-live,
+  .console-play,
+  .console-meta {
+    transition: none;
+    transform: none;
+  }
+  .console:has(.console-fold:checked) .console-play,
+  .console:has(.console-fold:checked) .console-meta {
+    transform: none;
+  }
 }
 
 /* The schedule toggle is in the hidden status row, so an open panel must
-   close with it. */
+   close with it - on the same fade, or it would hang 320ms over the folded
+   console (allow-discrete holds display until the transition ends). */
 .console:has(.console-fold:checked) .sc-toggle .sc-panel {
   display: none;
+  opacity: 0;
+  transform: translateY(-14px);
 }
 
 /* schedule disclosure */
@@ -1113,7 +1164,8 @@ body.framed {
     transition: none;
     transform: none;
   }
-  .sc-toggle:not([open]) .sc-panel {
+  .sc-toggle:not([open]) .sc-panel,
+  .console:has(.console-fold:checked) .sc-toggle .sc-panel {
     transform: none;
   }
 }

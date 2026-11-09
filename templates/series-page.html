@@ -6,7 +6,7 @@
 
 {% block content %}
 <h1><span class="kind">series</span> {{ page.title }}</h1>
-{{ page.content | safe }}
+{{ macros::body(html=page.content) }}
 {{ macros::series_pages(slug=page.slug, mode="list") }}
 <p><a {{ macros::href(path="/series/") }}>&larr; all series</a></p>
 {% endblock content %}

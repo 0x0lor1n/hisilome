@@ -8,7 +8,7 @@
 <h1><span class="kind">worklog</span> {{ page.title }}</h1>
 {{ macros::post_meta(page=page, permalink=true) }}
 {{ macros::series_strip(page=page) }}
-{{ page.content | safe }}
+{{ macros::body(html=page.content) }}
 
 <p><a {{ macros::href(path="/logs/") }}>&larr; back to all logs</a></p>
 {% endblock content %}

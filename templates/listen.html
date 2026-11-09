@@ -24,7 +24,12 @@
     fragment (`#/logs/`), loading=lazy so a hidden frame costs no request. The
     entry page's frame (.cur) is last and shown when nothing is targeted;
     `:target ~ .cur` needs no :has(). SSI drops the stack frame that matches the
-    entry route, or the fragment would load the same page twice. -#}
+    entry route, or the fragment would load the same page twice.
+
+    Every linked page needs a frame, tag pages included: a frame that
+    navigates itself sends its own URL as Referer, nginx then builds
+    $shell_href from it (`/tags/#/post/`) and the next link replaces the
+    whole shell. -#}
 {% block body %}
 {%- set_global routes = ["/", "/logs/", "/series/", "/tags/", "/colophon/", "/ls/"] %}
 {%- set writeups = get_section(path="_index.md") %}
@@ -32,6 +37,10 @@
 {%- set series = get_section(path="series/_index.md") %}
 {%- for p in writeups.pages | concat(with=logs.pages) | concat(with=series.pages) %}
   {%- set_global routes = routes | concat(with=[p.path]) %}
+{%- endfor %}
+{%- set tags = get_taxonomy(kind="tags") %}
+{%- for t in tags.items %}
+  {%- set_global routes = routes | concat(with=[t.path]) %}
 {%- endfor %}
 <body class="shell-body">
 <div class="frame">

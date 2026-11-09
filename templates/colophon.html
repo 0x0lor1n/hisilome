@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% import "macros.html" as macros %}
 
 {% block title %}{{ section.title | capitalize }} - {{ config.title }}{% endblock title %}
 {% block description %}<meta name="description" content="{{ section.description }}">{% endblock description %}
 
 {% block content %}
 <h1>Colophon</h1>
-{{ section.content | safe }}
+{{ macros::body(html=section.content) }}
 
-<p><a href="/">&larr; back to all posts</a></p>
+<p><a {{ macros::href(path="/") }}>&larr; back to all posts</a></p>
 {% endblock content %}
