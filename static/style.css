@@ -1484,7 +1484,7 @@ body.framed::before {
 .series-strip {
   color: var(--meta);
   font-size: 0.85rem;
-  margin-top: -0.6rem;
+  margin-top: 0.4rem;
   margin-bottom: 1.2rem;
   display: flex;
   flex-wrap: wrap;
