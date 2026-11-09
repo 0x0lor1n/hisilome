@@ -1,7 +1,7 @@
 # Called with the consumer's pkgs: the module passes the host's, flake.nix its own.
 pkgs: let
   inherit (pkgs) lib;
-  zola = pkgs.callPackage ./zola-0.22.nix {};
+  inherit (pkgs) zola;
 
   # music/ (1.1 GB) and radio/state/ (rewritten every second) would churn the host toplevel.
   src = builtins.path {

@@ -3,7 +3,7 @@ pkgs: hisilome:
 pkgs.mkShellNoCC {
   name = "hisilome";
   packages =
-    [hisilome.zola]
+    [pkgs.zola]
     ++ (with pkgs; [
       d2
       ffmpeg
